@@ -11,6 +11,7 @@ import com.example.nikit.news.entities.firebase.SharedNews;
 import com.example.nikit.news.ui.fragment.AvailableFriends;
 import com.example.nikit.news.ui.fragment.CommentToNews;
 import com.example.nikit.news.util.firebase.FirebaseNewsManager;
+import com.facebook.AccessToken;
 
 import java.util.HashSet;
 
@@ -60,7 +61,7 @@ public class ShareByApp extends AppCompatActivity
             sharedNews.setNewsId(newsId);
 
             for(String item: selectedFriends){
-                FirebaseNewsManager.shareNewsWithFriend(item, sharedNews);
+                FirebaseNewsManager.shareNewsWithFriend(AccessToken.getCurrentAccessToken().getUserId(), item, sharedNews);
             }
             Toast.makeText(getApplicationContext(), "success", Toast.LENGTH_SHORT).show();
             finish();

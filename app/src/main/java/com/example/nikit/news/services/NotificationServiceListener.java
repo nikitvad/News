@@ -1,4 +1,4 @@
-package com.example.nikit.news;
+package com.example.nikit.news.services;
 
 import android.app.Service;
 import android.content.Intent;

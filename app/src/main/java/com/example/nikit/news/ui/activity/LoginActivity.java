@@ -14,21 +14,21 @@ import com.example.nikit.news.R;
 import com.example.nikit.news.database.DatabaseManager;
 import com.example.nikit.news.database.SqLiteDbHelper;
 import com.example.nikit.news.util.Prefs;
-import com.example.nikit.news.util.facebook.FacebookUtil;
 import com.example.nikit.news.util.firebase.FirebaseUserManager;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -44,19 +44,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
-import org.json.JSONObject;
-
 import java.util.Arrays;
 import java.util.HashMap;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = LoginActivity.class.getSimpleName();
     private static final int RC_SIGN_IN = 9001;
-    private static String LOGIN_TAG = "LOGIN_FRAGMENT";
 
     private Button btLoginByFacebook;
     private Button btLoginByGoogle;
-    private Button btSkip;
 
     private CallbackManager callbackManager;
     private FirebaseAuth firebaseAuth;
@@ -79,7 +75,9 @@ public class LoginActivity extends AppCompatActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     synchronizeUserData();
+
                 } else {
+                    //signOut();
                     removeUserData();
                 }
             }
@@ -107,7 +105,7 @@ public class LoginActivity extends AppCompatActivity {
                 .build();
 
         googleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(LoginActivity.this, null)
+                .enableAutoManage(LoginActivity.this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
@@ -130,25 +128,27 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        btSkip = (Button) findViewById(R.id.bt_skip_auth);
-        btSkip.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+
+
+        //firebaseAuth.signOut();
+
 
     }
+
 
     @Override
     protected void onStart() {
         super.onStart();
+        googleApiClient.connect();
         firebaseAuth.addAuthStateListener(firebaseAuthStateListener);
+
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        googleApiClient.disconnect();
+
         if (firebaseAuthStateListener != null) {
             firebaseAuth.removeAuthStateListener(firebaseAuthStateListener);
         }
@@ -165,9 +165,10 @@ public class LoginActivity extends AppCompatActivity {
             } else {
 
             }
-        }
+        } else {
 
-        callbackManager.onActivityResult(requestCode, resultCode, data);
+            callbackManager.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     private void signInByGoogle() {
@@ -190,7 +191,9 @@ public class LoginActivity extends AppCompatActivity {
                                     Toast.LENGTH_SHORT).show();
                         } else {
                             Prefs.setLoggedType(Prefs.GOOGLE_LOGIN);
-                            finish();
+                            Intent intent = new Intent(LoginActivity.this, NewsActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
                         }
                     }
                 });
@@ -200,43 +203,26 @@ public class LoginActivity extends AppCompatActivity {
     private void handleFacebookAccessToken(final AccessToken token) {
         final SQLiteDatabase database = DatabaseManager.getInstance().openDatabase();
         final SqLiteDbHelper sqLiteDbHelper = new SqLiteDbHelper(getApplication());
-        final GraphRequest request = GraphRequest.newMeRequest(
-
-                AccessToken.getCurrentAccessToken(),
-                new GraphRequest.GraphJSONObjectCallback() {
-                    @Override
-                    public void onCompleted(JSONObject object, GraphResponse response) {
-                        //FirebaseUserManager.pushUserFriends(FacebookUtil.getUidFromJson(object), FacebookUtil.getFriendsFromJson(object));
-                        //sqLiteDbHelper.insertFriends(database, FacebookUtil.getFriendsFromJson(object));
-                        Log.d("friend-list-id", sqLiteDbHelper.getAllFriends(database).toString());
-                    }
-                });
-        Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,name,link,friends");
-        request.setParameters(parameters);
-
-        FirebaseUserManager.dsfgsdfgsdfg();
-
 
 
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         firebaseAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                Log.d(LOGIN_TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
                 if (!task.isSuccessful()) {
-                    Log.w(LOGIN_TAG, "signInWithCredential", task.getException());
                     Toast.makeText(LoginActivity.this, "Authentication failed.",
                             Toast.LENGTH_SHORT).show();
                 } else {
+                    FirebaseUserManager.pushUserInfo();
                     Prefs.setLoggedType(Prefs.FACEBOOK_LOGIN);
-                    //request.executeAsync();
-
-                    finish();
+                    Intent intent = new Intent(LoginActivity.this, NewsActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
                 }
 
             }
         });
+
 
     }
 
@@ -271,5 +257,12 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
     }
 }

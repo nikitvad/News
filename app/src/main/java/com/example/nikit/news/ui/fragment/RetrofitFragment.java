@@ -70,11 +70,8 @@ public class RetrofitFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if(newsRvAdapter.getItemCount()==0){
+        if (newsRvAdapter.getItemCount() == 0) {
             updateContent();
-        }
-        if(newsRvAdapter.getItemCount()<1) {
-            new LoadNewsAsyncTask().execute();
         }
     }
 
@@ -91,7 +88,7 @@ public class RetrofitFragment extends Fragment {
             }
         });
 
-        newsRvAdapter = new NewsRvAdapter();
+        newsRvAdapter = new NewsRvAdapter(this);
         rvNews.setAdapter(newsRvAdapter);
         rvNews.setLayoutManager(new LinearLayoutManager(view.getContext()));
 
@@ -117,7 +114,7 @@ public class RetrofitFragment extends Fragment {
 
     public void updateContent() {
         if (isAdded()) {
-            if(newsAsyncTask!=null && !newsAsyncTask.isCancelled()){
+            if (newsAsyncTask != null && !newsAsyncTask.isCancelled()) {
                 newsAsyncTask.cancel(true);
             }
             newsAsyncTask = new LoadNewsAsyncTask();
@@ -151,7 +148,7 @@ public class RetrofitFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... voids) {
 
-            if (NetworkUtil.isNetworkAvailable(getActivity())) {
+            if (getActivity()!=null && NetworkUtil.isNetworkAvailable(getActivity())) {
 
                 if (sourceIds.size() > 0) {
                     sqLiteDbHelper.clearNewsTable(database);

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,18 +36,21 @@ import java.util.ArrayList;
 
 public class NewsRvAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
     private final ArrayList<News.Article> articles;
+    private Fragment fragment;
 
     private int imageHeight = 720;
     private int imageWidth = 480;
 
-    public NewsRvAdapter() {
+    public NewsRvAdapter(Fragment fragment) {
         articles = new ArrayList<>();
+        this.fragment = fragment;
     }
 
     @Override
     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
         DatabaseManager.getInstance().closeDatabase();
+
     }
 
     @Override
@@ -61,7 +65,7 @@ public class NewsRvAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
     @Override
     public ArticleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        return new ArticleViewHolder(inflater.inflate(R.layout.article_item, parent, false), this);
+        return new ArticleViewHolder(inflater.inflate(R.layout.article_item, parent, false), this, fragment);
     }
 
     @Override

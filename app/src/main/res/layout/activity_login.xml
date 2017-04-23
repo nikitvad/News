@@ -10,8 +10,9 @@
     <LinearLayout
         android:id="@+id/login_by_email"
         android:layout_width="match_parent"
+
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
+        android:layout_centerInParent="true"
         android:orientation="vertical">
 
         <EditText
@@ -32,7 +33,7 @@
             android:id="@+id/bt_auth_submit"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorPrimary"
+            android:background="@drawable/rounded_button"
             android:text="Login"
             android:textColor="#fff"
             android:textSize="20sp" />
@@ -72,15 +73,6 @@
 
         </LinearLayout>
 
-        <Button
-            android:id="@+id/bt_skip_auth"
-            android:layout_width="250dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="skip"
-            android:textSize="25dp"
-            android:textColor="#fff"
-            android:background="@drawable/rounded_button" />
     </LinearLayout>
 
 

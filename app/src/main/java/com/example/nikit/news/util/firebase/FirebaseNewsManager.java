@@ -36,20 +36,20 @@ public class FirebaseNewsManager {
     }
 
 
-    public static void shareNewsWithFriend(final String openUid, final SharedNews news) {
-
+    public static void shareNewsWithFriend(final String authorUid, final String openUid, final SharedNews news) {
         DatabaseReference reference = database.getReference("users/openUID/" + openUid);
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String uid = dataSnapshot.getValue().toString();
 
-
-
                 Log.d("FirebaseNewsManager", uid);
-                DatabaseReference ref = database.getReference("users/" + uid + "/news-of-friends");
-                ref = ref.child(openUid).child(news.getNewsId());
+                DatabaseReference ref = database.getReference("users/" + uid + "/news-of-friends/all");
+                ref = ref.child(authorUid).child(news.getNewsId());
                 ref.setValue(news.toMap());
+
+                ref = database.getReference("users/" + uid + "/news-of-friends/new");
+                ref.child(news.getNewsId()).setValue(authorUid);
             }
 
             @Override
@@ -57,6 +57,37 @@ public class FirebaseNewsManager {
 
             }
         });
+    }
+
+    public static void getCountNewSharedNewses(final OnResultListener listener){
+        DatabaseReference reference = database.getReference("users/"+ firebaseAuth.getCurrentUser().getUid());
+        reference.child("news-of-friends/new").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.getValue()!=null) {
+                    long count = dataSnapshot.getChildrenCount();
+                    if (listener != null) {
+                        listener.onResult(count);
+                        Log.d("getCountNewSharedNewses", count + "");
+                    }
+                }else {
+                    if(listener!=null){
+                        listener.onResult(0);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+
+    public static interface OnResultListener{
+        void onResult(long count);
     }
 
 

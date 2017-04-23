@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import com.example.nikit.news.Constants;
 
 import com.example.nikit.news.R;
+import com.example.nikit.news.ui.SettingsActivity;
 import com.example.nikit.news.ui.activity.LoginActivity;
 import com.example.nikit.news.util.Prefs;
 import com.example.nikit.news.util.UpdateAvailableSourcesAsync;
@@ -62,10 +63,13 @@ public class BaseActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_login: {
-                Log.d("onOptionsItemSelected", "start");
                 Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivity(intent);
 
+            }
+            case R.id.menu_item_settings:{
+                Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(intent);
             }
         }
         return true;

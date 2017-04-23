@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/share_menu_by_program"
-        android:title="share by program" />
+        android:id="@+id/share_menu_by_app"
+        android:title="share by app" />
     <item
         android:id="@+id/share_menu_by_facebook"
         android:title="facebook" />

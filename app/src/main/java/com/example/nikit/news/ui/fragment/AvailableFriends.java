@@ -129,9 +129,6 @@ public class AvailableFriends extends Fragment {
             }
         }).load();
 
-
-
-
     }
 
     public interface OnFragmentInteractionListener {

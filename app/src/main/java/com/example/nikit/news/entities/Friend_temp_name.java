@@ -1,12 +1,11 @@
 package com.example.nikit.news.entities;
 
-import com.example.nikit.news.entities.ui.RecycleListItem;
 
 /**
  * Created by nikit on 10.04.2017.
  */
 
-public class Friend_temp_name extends RecycleListItem {
+public class Friend_temp_name {
     private String name;
     private long id;
 
@@ -37,8 +36,5 @@ public class Friend_temp_name extends RecycleListItem {
         this.id = id;
     }
 
-    @Override
-    public int getType() {
-        return 0;
-    }
+
 }

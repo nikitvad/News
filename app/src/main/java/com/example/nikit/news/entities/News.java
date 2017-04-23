@@ -1,9 +1,5 @@
 package com.example.nikit.news.entities;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-import com.example.nikit.news.entities.ui.RecycleListItem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,7 +64,7 @@ public class News {
         return articles.size();
     }
 
-    public static class Article extends RecycleListItem {
+    public static class Article {
         private String articleId;
         private String author;
         private String title;
@@ -168,7 +164,6 @@ public class News {
                     '}';
         }
 
-
         public HashMap<String, Object> toMap() {
             HashMap<String, Object> hashMap = new HashMap<>();
             hashMap.put("title", title);
@@ -178,14 +173,9 @@ public class News {
             hashMap.put("publishedAt", publishedAt);
             hashMap.put("author", author);
 
-            //hashMap.put("likes", like);
             return hashMap;
         }
 
-        @Override
-        public int getType() {
-            return 1;
-        }
     }
 
 

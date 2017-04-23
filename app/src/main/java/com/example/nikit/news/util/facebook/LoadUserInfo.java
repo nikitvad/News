@@ -26,16 +26,19 @@ public class LoadUserInfo {
 
     public static User getUserFromResponse(JSONObject object) {
         Gson gson = new Gson();
-        User user = gson.fromJson(object.toString(), User.class);
-        String urlToAvatar = "";
-        try {
-            urlToAvatar = object.getJSONObject("picture").getJSONObject("data").getString("url");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        user.setUrlToAvatar(urlToAvatar);
-        Log.d("LoadUserInfo", user.toString());
-        return user;
+        if(object==null) return null;
+            User user = gson.fromJson(object.toString(), User.class);
+            String urlToAvatar = "";
+            try {
+                urlToAvatar = object.getJSONObject("picture").getJSONObject("data").getString("url");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            user.setUrlToAvatar(urlToAvatar);
+            Log.d("LoadUserInfo", user.toString());
+
+            return user;
+
     }
 
     public void load() {

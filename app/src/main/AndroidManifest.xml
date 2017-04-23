@@ -32,15 +32,19 @@
             android:value="@string/facebook_app_id" />
 
         <service
-            android:name=".NotificationServiceListener"
+            android:name=".services.NotificationServiceListener"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+        <service android:name=".services.NewsFromFriendsService"></service>
 
-        <activity android:name=".ui.activity.ShareByApp"></activity>
+        <activity android:name=".ui.activity.ShareByApp" />
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:label="@string/title_activity_settings"></activity>
     </application>
 
 </manifest>

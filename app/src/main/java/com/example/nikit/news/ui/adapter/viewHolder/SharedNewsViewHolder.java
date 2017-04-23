@@ -17,6 +17,7 @@ public class SharedNewsViewHolder extends RecyclerView.ViewHolder {
 
     private ImageView ivUserAvatar;
     private TextView tvUserName;
+    private TextView tvComment;
 
     private TextView tvNewsTitle;
     private ImageView ivNewsImage;
@@ -28,6 +29,8 @@ public class SharedNewsViewHolder extends RecyclerView.ViewHolder {
         tvUserName = (TextView) itemView.findViewById(R.id.tv_user_name);
         ivUserAvatar = (ImageView) itemView.findViewById(R.id.iv_user_avatar);
 
+        tvComment = (TextView) itemView.findViewById((R.id.tv_news_comment));
+
         tvNewsTitle = (TextView) itemView.findViewById(R.id.tv_shared_news_article_title);
         ivNewsImage = (ImageView) itemView.findViewById(R.id.iv_shared_news_image);
         tvNewsDescription = (TextView) itemView.findViewById(R.id.tv_shared_news_article_desc);
@@ -36,6 +39,7 @@ public class SharedNewsViewHolder extends RecyclerView.ViewHolder {
     public void bindSharedNews(SharedNews news) {
         tvUserName.setText(news.getUser().getName());
         Glide.with(itemView.getContext()).load(news.getUser().getUrlToAvatar()).into(ivUserAvatar);
+        tvComment.setText(news.getComment());
 
         tvNewsTitle.setText(news.getArticle().getTitle());
         tvNewsDescription.setText(news.getArticle().getDescription());
