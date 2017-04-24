@@ -37,8 +37,9 @@ public class BaseActivity extends AppCompatActivity
         //SharedPreferences sharedPreferences = getSharedPreferences(getApplicationContext().getPackageName(),
         //        Context.MODE_PRIVATE);
 
-        if (Prefs.isFirstLaunch()) {
+        if (Prefs.isFirstLaunch()||Prefs.getLoggedType() == Prefs.NOT_LOGIN) {
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
 
             HashSet<String> strings = new HashSet<>();
