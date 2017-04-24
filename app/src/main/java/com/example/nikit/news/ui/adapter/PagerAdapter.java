@@ -12,7 +12,6 @@ import java.util.List;
  */
 
 public class PagerAdapter extends FragmentStatePagerAdapter {
-    int tabCount;
 
     private final List<Fragment> mFragmentList = new ArrayList<>();
     private final List<String> mFragmentTitleList = new ArrayList<>();

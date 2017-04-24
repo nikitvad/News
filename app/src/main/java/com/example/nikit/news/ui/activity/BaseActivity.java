@@ -2,7 +2,7 @@ package com.example.nikit.news.ui.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+//import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -29,26 +29,27 @@ import java.util.HashSet;
 
 public class BaseActivity extends AppCompatActivity
         implements UpdateAvailableSourcesAsync.OnUpdateStageListener {
-    private static final String FIRST_LAUNCH = "first_launch";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        SharedPreferences sharedPreferences = getSharedPreferences(getApplicationContext().getPackageName(),
-                Context.MODE_PRIVATE);
+        //SharedPreferences sharedPreferences = getSharedPreferences(getApplicationContext().getPackageName(),
+        //        Context.MODE_PRIVATE);
+
         if (Prefs.isFirstLaunch()) {
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
             startActivity(intent);
 
             HashSet<String> strings = new HashSet<>();
             strings.add("bbc-news");
-            sharedPreferences.edit().putStringSet(Constants.FILTER_SOURCES_TAG, strings).commit();
+            //sharedPreferences.edit().putStringSet(Constants.FILTER_SOURCES_TAG, strings).commit();
+            Prefs.setSourcesFilter(strings);
             new UpdateAvailableSourcesAsync(getApplicationContext(), this).execute();
 
             Prefs.setFirstLaunch(false);
         }
-        if(Prefs.getSourcesCount()==0){
+        if (Prefs.getSourcesCount() == 0) {
             new UpdateAvailableSourcesAsync(getApplicationContext(), this).execute();
         }
     }
@@ -62,12 +63,10 @@ public class BaseActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_item_login: {
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivity(intent);
+            case R.id.menu_item_login:
+                return true;
 
-            }
-            case R.id.menu_item_settings:{
+            case R.id.menu_item_settings: {
                 Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
                 startActivity(intent);
             }

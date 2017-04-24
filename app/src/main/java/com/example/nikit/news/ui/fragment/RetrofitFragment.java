@@ -2,7 +2,7 @@ package com.example.nikit.news.ui.fragment;
 
 
 import android.app.ActionBar;
-import android.content.SharedPreferences;
+//import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -29,6 +29,7 @@ import com.example.nikit.news.entities.News;
 import com.example.nikit.news.ui.adapter.NewsRvAdapter;
 import com.example.nikit.news.ui.dialog.FilterDialog;
 import com.example.nikit.news.util.NetworkUtil;
+import com.example.nikit.news.util.Prefs;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +45,7 @@ import java.util.Set;
 public class RetrofitFragment extends Fragment {
     private RecyclerView rvNews;
     private NewsRvAdapter newsRvAdapter;
-    private SharedPreferences preferences;
+    //private SharedPreferences preferences;
     private SwipeRefreshLayout swipeRefreshLayout;
 
     private LoadNewsAsyncTask newsAsyncTask;
@@ -62,8 +63,8 @@ public class RetrofitFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         sqLiteDbHelper = new SqLiteDbHelper(getContext());
-        preferences = container.getContext().getSharedPreferences(
-                container.getContext().getPackageName(), container.getContext().MODE_PRIVATE);
+        //preferences = container.getContext().getSharedPreferences(
+        //        container.getContext().getPackageName(), container.getContext().MODE_PRIVATE);
         return inflater.inflate(R.layout.fragment_retrofit, container, false);
     }
 
@@ -128,7 +129,8 @@ public class RetrofitFragment extends Fragment {
 
         @Override
         protected void onPreExecute() {
-            sourceIds = preferences.getStringSet(Constants.FILTER_SOURCES_TAG, new HashSet<String>());
+            //sourceIds = preferences.getStringSet(Constants.FILTER_SOURCES_TAG, new HashSet<String>());
+            sourceIds = Prefs.getSourcesFilter();
             database = DatabaseManager.getInstance().openDatabase();
             swipeRefreshLayout.setRefreshing(true);
         }

@@ -3,6 +3,7 @@ package com.example.nikit.news.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class Prefs {
@@ -12,6 +13,9 @@ public class Prefs {
     public static final String LOGGED_TYPE = "prefs_logged_type";
     public static final String SOURCES_COUNT = "prefs_sources_count";
     public static final String FIRST_LAUNCH = "first_launch";
+    public static final String SOURCES_FILTER = "sources-filter";
+    public static final String DISPLAY_WIDTH = "display_width";
+
 
     public static final int NOT_LOGIN = 0;
     public static final int GOOGLE_LOGIN = 1;
@@ -28,7 +32,6 @@ public class Prefs {
         }
     }
 
-    // login and user
     public static int getLoggedType() {
         return getInt(LOGGED_TYPE);
     }
@@ -48,10 +51,27 @@ public class Prefs {
     public static boolean isFirstLaunch(){
         return !getBool(FIRST_LAUNCH);
     }
+
     public static void setFirstLaunch(boolean value){
         setBool(FIRST_LAUNCH, !value);
     }
-    // standard methods
+
+    public static void setSourcesFilter(Set<String> sources){
+        setStringSet(SOURCES_FILTER, sources);
+    }
+
+    public static int getDisplayWidth(){
+        return sPrefs.getInt(DISPLAY_WIDTH, 768);
+    }
+
+    public static void setDisplayWidth(int width){
+        setInt(DISPLAY_WIDTH, width);
+    }
+
+    public static Set<String> getSourcesFilter(){
+        return sPrefs.getStringSet(SOURCES_FILTER, new HashSet<String>());
+    }
+
     private static String getString(String key) {
         return sPrefs.getString(key, "");
     }
@@ -80,6 +100,7 @@ public class Prefs {
     }
 
     private static void setStringSet(String key, Set<String> stringSet) {
+        sPrefs.edit().remove(key);
         sPrefs.edit().putStringSet(key, stringSet).apply();
     }
 

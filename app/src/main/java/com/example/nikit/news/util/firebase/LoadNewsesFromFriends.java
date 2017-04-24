@@ -1,7 +1,6 @@
 package com.example.nikit.news.util.firebase;
 
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.example.nikit.news.entities.News;
 import com.example.nikit.news.entities.facebook.User;
@@ -29,7 +28,6 @@ public class LoadNewsesFromFriends {
     private static final String TAG = LoadNewsesFromFriends.class.getSimpleName();
     private FirebaseDatabase database;
     private FirebaseAuth firebaseAuth;
-    //private OnProgressListener mListener;
 
     public LoadNewsesFromFriends(@Nullable OnProgressListener listener) {
         database = FirebaseDatabase.getInstance();
@@ -55,12 +53,12 @@ public class LoadNewsesFromFriends {
             public void onDataChange(final DataSnapshot dataSnapshot) {
 
                 if (dataSnapshot.getValue() == null) {
-                    Log.e(TAG, "no data error");
                     return;
                 }
                 GenericTypeIndicator<HashMap<String, HashMap<String, SharedNews>>> t =
                         new GenericTypeIndicator<HashMap<String, HashMap<String, SharedNews>>>() {
                         };
+
 
                 HashMap<String, HashMap<String, SharedNews>> hashMap;
                 hashMap = dataSnapshot.getValue(t);
@@ -68,6 +66,7 @@ public class LoadNewsesFromFriends {
                 Iterator<Map.Entry<String, HashMap<String, SharedNews>>> iterator = hashMap.entrySet().iterator();
                 while (iterator.hasNext()) {
                     final Map.Entry<String, HashMap<String, SharedNews>> pair = iterator.next();
+
 
                     new FirebaseLoadNews(new FirebaseLoadNews.OnProgressListener() {
                         @Override
@@ -81,12 +80,11 @@ public class LoadNewsesFromFriends {
                                     sharedNews.setUser(user);
                                     if (mListener != null) {
                                         mListener.onProgress(sharedNews);
-                                        if(sharedNews.getNewsType().equals(sharedNews.NEWS_TYPE_NEW)){
+                                        if (sharedNews.getNewsType().equals(SharedNews.NEWS_TYPE_NEW)) {
                                             dataSnapshot.getRef().child(user.getId()).child(sharedNews.getNewsId())
                                                     .child("newsType").setValue(SharedNews.NEWS_TYPE_DEF);
                                         }
                                     }
-                                    Log.d("getNewsesOfFriends111", sharedNews.toString());
 
                                 }
                             }).load(pair.getKey());
@@ -115,7 +113,8 @@ public class LoadNewsesFromFriends {
 
                 if (dataSnapshot.getValue() != null) {
                     HashMap<String, String> hashMap = new HashMap<String, String>();
-                    GenericTypeIndicator<HashMap<String, String>> t = new GenericTypeIndicator<HashMap<String, String>>() {};
+                    GenericTypeIndicator<HashMap<String, String>> t = new GenericTypeIndicator<HashMap<String, String>>() {
+                    };
 
                     hashMap = dataSnapshot.getValue(t);
                     Iterator<Map.Entry<String, String>> iterator = hashMap.entrySet().iterator();
@@ -128,7 +127,6 @@ public class LoadNewsesFromFriends {
 
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                Log.d("loadNew", dataSnapshot.toString());
                                 if (dataSnapshot.getValue() != null) {
                                     SharedNews sharedNews = dataSnapshot.getValue(SharedNews.class);
                                 }

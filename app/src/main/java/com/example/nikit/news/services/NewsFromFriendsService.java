@@ -3,6 +3,7 @@ package com.example.nikit.news.services;
 import android.app.IntentService;
 import android.content.Intent;
 
+import com.example.nikit.news.R;
 import com.example.nikit.news.util.NotificationUtils;
 import com.example.nikit.news.util.firebase.FirebaseNewsManager;
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,7 +24,6 @@ public class NewsFromFriendsService extends IntentService {
      * the intent that started the service. When this method returns, IntentService
      * stops the service, as appropriate.
      */
-    private long newsCount = 0;
 
     /**
      * A constructor is required, and must call the super IntentService(String)
@@ -45,12 +45,8 @@ public class NewsFromFriendsService extends IntentService {
                         @Override
                         public void onResult(long count) {
                             if (count > 0) {
-                                if (count - newsCount > 0) {
-                                    newsCount = count;
-                                    NotificationUtils.getInstance(getApplicationContext()).createInfoNotification("Драсте");
-                                }
-                            } else {
-                                newsCount = 0;
+                                NotificationUtils.getInstance(getApplicationContext()).createInfoNotification(
+                                        getResources().getString(R.string.notification_there_newses_fom_friends));
                             }
                         }
                     });

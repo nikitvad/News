@@ -26,8 +26,6 @@ public class SharedNews extends ListItem {
         return newsType;
     }
 
-
-
     public void setNewsType(String newsType) {
         this.newsType = newsType;
     }
@@ -92,6 +90,7 @@ public class SharedNews extends ListItem {
                 "newsId='" + newsId + '\'' +
                 ", comment='" + comment + '\'' +
                 ", date='" + date + '\'' +
+                ", newsType='" + newsType + '\'' +
                 ", article=" + article +
                 ", user=" + user +
                 '}';

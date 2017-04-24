@@ -26,9 +26,7 @@ import java.util.ArrayList;
  */
 
 public class JsonUtil {
-    //private static String jsonString;
     public static String loadJsonString(String urlAddress) {
-        //new LoadJsonAsyncTask().execute(urlAddress);
         String jsonStringResult = "";
 
         try {

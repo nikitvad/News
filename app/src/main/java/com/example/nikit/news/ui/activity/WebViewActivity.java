@@ -26,7 +26,6 @@ public class WebViewActivity extends BaseActivity {
 
     public static final String KEY_NEWS_URL = "NEWS_URL";
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

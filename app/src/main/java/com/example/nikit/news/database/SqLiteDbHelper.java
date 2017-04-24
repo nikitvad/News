@@ -6,13 +6,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.nikit.news.entities.Friend_temp_name;
 import com.example.nikit.news.entities.News;
 import com.example.nikit.news.entities.Source;
 import com.example.nikit.news.database.DataBaseContract.SourceTable;
 import com.example.nikit.news.database.DataBaseContract.NewsTable;
 import com.example.nikit.news.database.DataBaseContract.LikedNewsTable;
-import com.example.nikit.news.database.DataBaseContract.FriendsTable;
 
 import com.example.nikit.news.util.Util;
 
@@ -35,7 +33,6 @@ public class SqLiteDbHelper extends SQLiteOpenHelper {
         db.execSQL(DataBaseContract.SourceTable.CREATE_TABLE);
         db.execSQL(DataBaseContract.NewsTable.CREATE_TABLE);
         db.execSQL(LikedNewsTable.CREATE_TABLE);
-        db.execSQL(DataBaseContract.FriendsTable.CREATE_TABLE);
     }
 
     @Override
@@ -51,8 +48,6 @@ public class SqLiteDbHelper extends SQLiteOpenHelper {
             db.execSQL(LikedNewsTable.DELETE_TABLE);
             db.execSQL(LikedNewsTable.CREATE_TABLE);
 
-            db.execSQL(DataBaseContract.FriendsTable.DELETE_TABLE);
-            db.execSQL(DataBaseContract.FriendsTable.CREATE_TABLE);
         }
     }
 
@@ -138,35 +133,7 @@ public class SqLiteDbHelper extends SQLiteOpenHelper {
         return articles;
     }
 
-    public ArrayList<Friend_temp_name> getAllFriends(SQLiteDatabase db) {
-        Cursor cursor = db.query(FriendsTable.TABLE_NAME,
-                new String[]{FriendsTable._ID, FriendsTable.COLUMN_NAME_USER_NAME},
-                null, null, null, null, null);
-        ArrayList<Friend_temp_name> friends = new ArrayList<>();
-        if (cursor.moveToFirst()) {
-            do {
-                Friend_temp_name friend = new Friend_temp_name();
-                friend.setId(Long.parseLong(cursor.getString(0)));
-                friend.setName(cursor.getString(1));
-                friends.add(friend);
-            } while (cursor.moveToNext());
-        }
-        return friends;
-    }
 
-    public void clearFriendsTable(SQLiteDatabase db){
-        db.delete(FriendsTable.TABLE_NAME, null, null);
-    }
-
-    public void insertFriends(SQLiteDatabase db, ArrayList<Friend_temp_name> friends){
-        for(Friend_temp_name friend : friends ){
-            ContentValues values = new ContentValues();
-            values.put(FriendsTable._ID, friend.getId()+"");
-            values.put(FriendsTable.COLUMN_NAME_USER_NAME, friend.getName());
-            db.insert(FriendsTable.TABLE_NAME, null, values);
-        }
-
-    }
 
     private Source getSourceFromCursor(Cursor cursor) {
         Source source = new Source();

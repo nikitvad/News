@@ -19,45 +19,28 @@ import java.util.ArrayList;
 
 public class NewsesFromFriendsRvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    //private ArrayList<SharedNews> newses;
 
-    public static final int NEWS_TYPE_NEW = 0;
-    public static final int NEWS_TYPE_OLD = 1;
-    /*
-        public void swapData(ArrayList<SharedNews> data) {
-            if (data != null && data.size() > 0) {
-                newses.clear();
-                newses.addAll(data);
-                notifyDataSetChanged();
-            }
-        }
-    */
     private int newNewsesCount = -1;
     private int oldNewsesCount = -1;
+
     private ArrayList<ListItem> items;
 
     public NewsesFromFriendsRvAdapter() {
-        //newses = new ArrayList<>();
 
         items = new ArrayList<>();
     }
 
-    public NewsesFromFriendsRvAdapter(ArrayList<SharedNews> newses) {
-        //this.newses = newses;
-    }
-
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        /*SharedNewsViewHolder viewHolder = new SharedNewsViewHolder(LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.shared_news_item, parent, false));
-        */
         RecyclerView.ViewHolder viewHolder;
         if (viewType == ListItem.DEF_ITEM) {
             viewHolder = new SharedNewsViewHolder(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.shared_news_item, parent, false));
+
         } else if (viewType == ListItem.TITLE_ITEM) {
             viewHolder = new TitleViewHolder(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.group_title_item, parent, false));
+
         } else viewHolder = null;
 
         return viewHolder;
@@ -70,13 +53,10 @@ public class NewsesFromFriendsRvAdapter extends RecyclerView.Adapter<RecyclerVie
         } else if (holder instanceof TitleViewHolder) {
             ((TitleViewHolder) holder).bindTitle((GroupTitle) items.get(position));
         }
-        // holder.bindSharedNews(newses.get(position));
     }
 
     @Override
     public int getItemCount() {
-        //return newses.size();
-
         return items.size();
     }
 
@@ -109,15 +89,16 @@ public class NewsesFromFriendsRvAdapter extends RecyclerView.Adapter<RecyclerVie
         }
     }
 
+    public void clearData(){
+        newNewsesCount=-1;
+        oldNewsesCount=-1;
+        items.clear();
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemViewType(int position) {
         return items.get(position).getType();
     }
 
-    public void insertItem(ListItem item, int pos) {
-        if (pos < items.size() && item != null) {
-            items.add(pos, item);
-            notifyItemInserted(pos);
-        }
-    }
 }

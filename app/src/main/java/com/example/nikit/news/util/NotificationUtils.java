@@ -48,7 +48,6 @@ public class NotificationUtils {
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         notificationIntent.putExtra(NewsActivity.FRAGMENT_TYPE_KEY, NewsActivity.SHARED_NEWS_FRAGMENT_TYPE);
         NotificationCompat.Builder nb = new NotificationCompat.Builder(context)
-//NotificationCompat.Builder nb = new NotificationBuilder(context) //для версии Android > 3.0
                 .setSmallIcon(R.drawable.com_facebook_button_icon)
                 .setAutoCancel(true)
                 .setTicker(message)

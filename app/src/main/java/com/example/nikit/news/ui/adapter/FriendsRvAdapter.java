@@ -92,14 +92,12 @@ public class FriendsRvAdapter extends RecyclerView.Adapter<FriendsRvAdapter.Frie
         @Override
         public void onClick(View view) {
             if (mListener != null) {
-                if(!cbSelected.isChecked()) {
+                if (!cbSelected.isChecked()) {
                     cbSelected.setChecked(true);
                     mListener.onClick(view, users.get(getAdapterPosition()));
-                    Toast.makeText(view.getContext(), "Offf", Toast.LENGTH_SHORT).show();
-                }else{
+                } else {
                     cbSelected.setChecked(false);
                     mListener.onClick(view, users.get(getAdapterPosition()));
-                    Toast.makeText(view.getContext(), "Ogg", Toast.LENGTH_SHORT).show();
 
                 }
             }

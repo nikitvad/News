@@ -35,17 +35,16 @@ public class NewsActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, FilterDialog.NoticeDialogListener {
 
     public static final String FRAGMENT_TYPE_KEY = "fragment_type";
-    public static final String MAIN_FRAGMENT_TYPE = "main_fragment";
     public static final String SHARED_NEWS_FRAGMENT_TYPE = "shared_news_fragment";
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private Toolbar toolbar;
+    private DrawerLayout drawer;
 
     private FirebaseAuth firebaseAuth;
     private GoogleApiClient googleApiClient;
 
-    private DrawerLayout drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +53,6 @@ public class NewsActivity extends BaseActivity
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
         viewPager = (ViewPager) findViewById(R.id.pager);
         setupViewPager(viewPager);
@@ -99,10 +97,6 @@ public class NewsActivity extends BaseActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //testing part start
-
-        //end
-
     }
 
     @Override
@@ -119,15 +113,12 @@ public class NewsActivity extends BaseActivity
     private void setupViewPager(ViewPager viewPager) {
         PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager());
         pagerAdapter.addFragment(new RetrofitFragment(), "News");
-        pagerAdapter.addFragment(NewsFromFriendsFragment.newInstance("", ""), "friends");
-        //pagerAdapter.addFragment(new SourcesFragment(), "Sources");
+        pagerAdapter.addFragment(NewsFromFriendsFragment.newInstance(), "friends");
         viewPager.setAdapter(pagerAdapter);
     }
 
-
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
@@ -168,13 +159,14 @@ public class NewsActivity extends BaseActivity
             String fragmentType = intent.getExtras().getString(FRAGMENT_TYPE_KEY);
             if (fragmentType.equals(SHARED_NEWS_FRAGMENT_TYPE)) {
                 viewPager.setCurrentItem(1);
+                intent.removeExtra(FRAGMENT_TYPE_KEY);
             }
         }
     }
 
     private void signOut() {
         Intent intent = new Intent(this, LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         if (Prefs.getLoggedType() == Prefs.GOOGLE_LOGIN) {
             if (googleApiClient.isConnected()) {
                 Auth.GoogleSignInApi.signOut(googleApiClient);
@@ -190,6 +182,5 @@ public class NewsActivity extends BaseActivity
             startActivity(intent);
         }
     }
-
 
 }

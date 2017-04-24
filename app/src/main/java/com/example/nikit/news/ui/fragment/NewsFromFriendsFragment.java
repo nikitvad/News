@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,14 +23,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 
 public class NewsFromFriendsFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private DatabaseReference reference;
     private RecyclerView recyclerView;
@@ -42,7 +35,7 @@ public class NewsFromFriendsFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static NewsFromFriendsFragment newInstance(String param1, String param2) {
+    public static NewsFromFriendsFragment newInstance() {
         NewsFromFriendsFragment fragment = new NewsFromFriendsFragment();
         return fragment;
     }
@@ -62,7 +55,6 @@ public class NewsFromFriendsFragment extends Fragment {
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-
     }
 
 
@@ -71,14 +63,7 @@ public class NewsFromFriendsFragment extends Fragment {
         super.onResume();
 
         updateContent();
-        /*
-        new LoadNewsesFromFriends(new LoadNewsesFromFriends.OnProgressListener() {
-            @Override
-            public void onProgress(SharedNews sharedNews) {
-                //adapter.addShareNews(sharedNews);
-            }
-        }).load(LoadNewsesFromFriends.LOAD_NEW);
-*/
+
     }
 
     @Override
@@ -102,11 +87,13 @@ public class NewsFromFriendsFragment extends Fragment {
 
     public void updateContent() {
 
+        adapter.clearData();
         LoadNewsesFromFriends loadNewsesFromFriends = new LoadNewsesFromFriends();
         loadNewsesFromFriends.loadAll(new LoadNewsesFromFriends.OnProgressListener() {
             @Override
             public void onProgress(SharedNews sharedNews) {
                 adapter.addShareNews(sharedNews);
+                Log.d("sdfgsdfsdfg", sharedNews.toString());
             }
         });
 

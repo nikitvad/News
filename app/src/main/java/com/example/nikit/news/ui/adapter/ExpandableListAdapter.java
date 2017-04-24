@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import android.content.Context;
-import android.content.SharedPreferences;
+//import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,12 +20,13 @@ import android.widget.TextView;
 import com.example.nikit.news.Constants;
 import com.example.nikit.news.R;
 import com.example.nikit.news.entities.Source;
+import com.example.nikit.news.util.Prefs;
 
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     private Context context;
     private List<String> listDataHeader; // header titles
-    private SharedPreferences sharedPreferences;
+    //private SharedPreferences sharedPreferences;
     private Set<String> filterSourcesSet;
 
     // child data in format of header title, child title
@@ -38,8 +39,10 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         this.listDataChild = listChildData;
 
         filterSourcesSet = new HashSet<>();
-        sharedPreferences = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
-        filterSourcesSet.addAll(sharedPreferences.getStringSet(Constants.FILTER_SOURCES_TAG, new HashSet<String>()));
+        //sharedPreferences = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
+        //filterSourcesSet.addAll(sharedPreferences.getStringSet(Constants.FILTER_SOURCES_TAG, new HashSet<String>()));
+        filterSourcesSet.addAll(Prefs.getSourcesFilter());
+
 
     }
 
@@ -141,11 +144,14 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     public void saveChanges() {
-        sharedPreferences.edit().remove(Constants.FILTER_SOURCES_TAG).commit();
-        sharedPreferences.edit().putStringSet(Constants.FILTER_SOURCES_TAG, filterSourcesSet).commit();
+        Prefs.setSourcesFilter(filterSourcesSet);
+        //sharedPreferences.edit().remove(Constants.FILTER_SOURCES_TAG).commit();
+        //sharedPreferences.edit().putStringSet(Constants.FILTER_SOURCES_TAG, filterSourcesSet).commit();
     }
 
     public void resetChanges() {
-        filterSourcesSet = sharedPreferences.getStringSet(Constants.FILTER_SOURCES_TAG, new HashSet<String>());
+        //filterSourcesSet = sharedPreferences.getStringSet(Constants.FILTER_SOURCES_TAG, new HashSet<String>());
+        filterSourcesSet = Prefs.getSourcesFilter();
+
     }
 }

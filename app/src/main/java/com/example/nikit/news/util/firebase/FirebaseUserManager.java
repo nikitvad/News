@@ -1,18 +1,21 @@
 package com.example.nikit.news.util.firebase;
 
-import com.example.nikit.news.entities.Friend_temp_name;
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+
+import com.example.nikit.news.database.DatabaseManager;
+import com.example.nikit.news.database.SqLiteDbHelper;
 import com.example.nikit.news.entities.facebook.User;
 import com.example.nikit.news.util.facebook.LoadUserFriends;
 import com.example.nikit.news.util.facebook.LoadUserInfo;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -52,6 +55,33 @@ public class FirebaseUserManager {
             }
         }).load();
 
+    }
+
+    public static void synchronizeUserData(Context context) {
+        final SqLiteDbHelper sqLiteDbHelper = new SqLiteDbHelper(context);
+        final SQLiteDatabase database = DatabaseManager.getInstance().openDatabase();
+
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference reference = firebaseDatabase.getReference("users/" + firebaseAuth.getCurrentUser().getUid());
+
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                GenericTypeIndicator<HashMap<String, String>> t = new GenericTypeIndicator<HashMap<String, String>>() {
+                };
+                HashMap<String, String> likedNewsIds;
+                likedNewsIds = dataSnapshot.child("liked-news").getValue(t);
+                sqLiteDbHelper.clearLikedNewsTable(database);
+                if (likedNewsIds != null && likedNewsIds.size() > 0) {
+                    sqLiteDbHelper.addAllLikedNewses(database, likedNewsIds);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
 }

@@ -12,6 +12,8 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_settings">Settings</string>
 
+    <string name="share_available_for_facebook_users">Функция доступна только для пользователей facebook</string>
+    <string name="notification_there_newses_fom_friends">У вас есть новости от друзей</string>
     <!-- Strings related to Settings -->
 
     <!-- Example General settings -->

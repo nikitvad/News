@@ -59,19 +59,19 @@ public class FirebaseNewsManager {
         });
     }
 
-    public static void getCountNewSharedNewses(final OnResultListener listener){
-        DatabaseReference reference = database.getReference("users/"+ firebaseAuth.getCurrentUser().getUid());
+    public static void getCountNewSharedNewses(final OnResultListener listener) {
+        DatabaseReference reference = database.getReference("users/" + firebaseAuth.getCurrentUser().getUid());
         reference.child("news-of-friends/new").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.getValue()!=null) {
+                if (dataSnapshot.getValue() != null) {
                     long count = dataSnapshot.getChildrenCount();
                     if (listener != null) {
                         listener.onResult(count);
-                        Log.d("getCountNewSharedNewses", count + "");
+                        dataSnapshot.getRef().removeValue();
                     }
-                }else {
-                    if(listener!=null){
+                } else {
+                    if (listener != null) {
                         listener.onResult(0);
                     }
                 }
@@ -86,7 +86,7 @@ public class FirebaseNewsManager {
     }
 
 
-    public static interface OnResultListener{
+    public static interface OnResultListener {
         void onResult(long count);
     }
 

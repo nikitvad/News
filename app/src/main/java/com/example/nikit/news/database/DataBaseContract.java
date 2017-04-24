@@ -8,7 +8,7 @@ import android.provider.BaseColumns;
 
 public final class DataBaseContract {
 
-    public static final int DB_VERSION = 13;
+    public static final int DB_VERSION = 14;
     public static final String DB_NAME = "news_db.db";
     public static final String TEXT_TYPE = " TEXT";
     public static final String COMMA_SEP = ",";
@@ -94,20 +94,6 @@ public final class DataBaseContract {
         public static final String CREATE_TABLE = "CREATE TABLE " +
                 TABLE_NAME + " (" +
                 _ID + " TEXT PRIMARY KEY)";
-    }
-
-    public abstract class FriendsTable implements BaseColumns{
-        public static final String TABLE_NAME = "friends";
-        public static final String COLUMN_NAME_USER_NAME = "name";
-
-        public static final String DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
-        public static final String CREATE_TABLE = "CREATE TABLE " +
-                TABLE_NAME + " ("+
-                _ID + " TEXT PRIMARY KEY, " +
-                COLUMN_NAME_USER_NAME + TEXT_TYPE + ")";
-
-
-
     }
 
 }

@@ -47,8 +47,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.Arrays;
 import java.util.HashMap;
 
-public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
-    private static final String TAG = LoginActivity.class.getSimpleName();
+public class LoginActivity extends AppCompatActivity{
+
     private static final int RC_SIGN_IN = 9001;
 
     private Button btLoginByFacebook;
@@ -67,6 +67,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        //Firebase initializing
         firebaseDatabase = FirebaseDatabase.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseAuthStateListener = new FirebaseAuth.AuthStateListener() {
@@ -74,15 +75,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
-                    synchronizeUserData();
-
+                    FirebaseUserManager.synchronizeUserData(getApplicationContext());
                 } else {
-                    //signOut();
                     removeUserData();
                 }
             }
         };
 
+        //facebook login initializing
         callbackManager = CallbackManager.Factory.create();
         LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
@@ -99,16 +99,18 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             }
         });
 
+        //google sign initializing
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
 
         googleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(LoginActivity.this, this)
+                .enableAutoManage(LoginActivity.this, null)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
+        //login buttons
         btLoginByFacebook = (Button) findViewById(R.id.login_by_facebook);
         btLoginByFacebook.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,7 +121,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
             }
         });
-
         btLoginByGoogle = (Button) findViewById(R.id.bt_login_by_google);
         btLoginByGoogle.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,18 +129,13 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             }
         });
 
-
-
-        //firebaseAuth.signOut();
-
-
     }
 
 
     @Override
     protected void onStart() {
         super.onStart();
-        googleApiClient.connect();
+//        googleApiClient.connect();
         firebaseAuth.addAuthStateListener(firebaseAuthStateListener);
 
     }
@@ -147,7 +143,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     @Override
     protected void onStop() {
         super.onStop();
-        googleApiClient.disconnect();
+//        googleApiClient.disconnect();
 
         if (firebaseAuthStateListener != null) {
             firebaseAuth.removeAuthStateListener(firebaseAuthStateListener);
@@ -166,7 +162,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
             }
         } else {
-
             callbackManager.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -176,7 +171,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
-
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
@@ -184,9 +178,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
                         if (!task.isSuccessful()) {
-                            Log.w(TAG, "signInWithCredential", task.getException());
                             Toast.makeText(LoginActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
@@ -201,9 +193,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     }
 
     private void handleFacebookAccessToken(final AccessToken token) {
-        final SQLiteDatabase database = DatabaseManager.getInstance().openDatabase();
-        final SqLiteDbHelper sqLiteDbHelper = new SqLiteDbHelper(getApplication());
-
 
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         firebaseAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -223,7 +212,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             }
         });
 
-
     }
 
     private void removeUserData() {
@@ -233,36 +221,4 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         DatabaseManager.getInstance().closeDatabase();
     }
 
-    private void synchronizeUserData() {
-        final SqLiteDbHelper sqLiteDbHelper = new SqLiteDbHelper(getApplicationContext());
-        final SQLiteDatabase database = DatabaseManager.getInstance().openDatabase();
-
-        firebaseDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference reference = firebaseDatabase.getReference("users/" + firebaseAuth.getCurrentUser().getUid());
-
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                GenericTypeIndicator<HashMap<String, String>> t = new GenericTypeIndicator<HashMap<String, String>>() {
-                };
-                likedNewsIds = dataSnapshot.child("liked-news").getValue(t);
-                sqLiteDbHelper.clearLikedNewsTable(database);
-                if (likedNewsIds != null && likedNewsIds.size() > 0) {
-                    sqLiteDbHelper.addAllLikedNewses(database, likedNewsIds);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
 }

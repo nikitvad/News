@@ -33,15 +33,15 @@ public class ShareByApp extends AppCompatActivity
         setContentView(R.layout.activity_share_by_app);
 
         Bundle bundle = getIntent().getBundleExtra("ARGS");
-        if(bundle != null) {
+        if (bundle != null) {
             newsId = bundle.getString(CommentToNews.ARG_NEWS_ID, "");
 
             commentToNews = CommentToNews.newInstance(getIntent().getBundleExtra("ARGS"));
-            availableFriends = AvailableFriends.newInstance("", "");
+            availableFriends = AvailableFriends.newInstance();
             fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.share_container, availableFriends).commit();
 
-        }else {
+        } else {
             Toast.makeText(getApplicationContext(), "error", Toast.LENGTH_SHORT).show();
             finish();
         }
@@ -55,17 +55,17 @@ public class ShareByApp extends AppCompatActivity
 
     @Override
     public void onInteraction(String comment) {
-        if(!newsId.isEmpty() && newsId.length()>0) {
+        if (!newsId.isEmpty() && newsId.length() > 0) {
             SharedNews sharedNews = new SharedNews();
             sharedNews.setComment(comment);
             sharedNews.setNewsId(newsId);
 
-            for(String item: selectedFriends){
+            for (String item : selectedFriends) {
                 FirebaseNewsManager.shareNewsWithFriend(AccessToken.getCurrentAccessToken().getUserId(), item, sharedNews);
             }
             Toast.makeText(getApplicationContext(), "success", Toast.LENGTH_SHORT).show();
             finish();
-        } else{
+        } else {
             Toast.makeText(getApplicationContext(), "error", Toast.LENGTH_SHORT).show();
             finish();
         }
