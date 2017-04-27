@@ -14,18 +14,18 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.example.nikit.news.R;
 
 import com.example.nikit.news.services.NewsFromFriendsService;
 import com.example.nikit.news.ui.adapter.PagerAdapter;
 import com.example.nikit.news.ui.dialog.FilterDialog;
+import com.example.nikit.news.ui.fragment.FavoritesFragment;
 import com.example.nikit.news.ui.fragment.NewsFromFriendsFragment;
-import com.example.nikit.news.ui.fragment.RetrofitFragment;
+import com.example.nikit.news.ui.fragment.NewsFragment;
+import com.example.nikit.news.ui.fragment.TopNewsesFragment;
 import com.example.nikit.news.util.Prefs;
 import com.facebook.login.LoginManager;
-import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -71,12 +71,13 @@ public class NewsActivity extends BaseActivity
                 .build();
 
         firebaseAuth = FirebaseAuth.getInstance();
+
         firebaseAuth.addAuthStateListener(new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 Fragment fragment = ((PagerAdapter) viewPager.getAdapter()).getFragmentByPos(0);
-                if (fragment instanceof RetrofitFragment) {
-                    ((RetrofitFragment) fragment).updateContent();
+                if (fragment instanceof NewsFragment) {
+                    ((NewsFragment) fragment).updateContent();
 
                     Intent intent = new Intent(getApplicationContext(), NewsFromFriendsService.class);
                     if (Prefs.getLoggedType() == Prefs.FACEBOOK_LOGIN) {
@@ -97,6 +98,10 @@ public class NewsActivity extends BaseActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+
+        //test
+
+
     }
 
     @Override
@@ -112,8 +117,10 @@ public class NewsActivity extends BaseActivity
 
     private void setupViewPager(ViewPager viewPager) {
         PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager());
-        pagerAdapter.addFragment(new RetrofitFragment(), "News");
+        pagerAdapter.addFragment(new NewsFragment(), "News");
         pagerAdapter.addFragment(NewsFromFriendsFragment.newInstance(), "friends");
+        pagerAdapter.addFragment(FavoritesFragment.newInstance("", ""), "favorites");
+        pagerAdapter.addFragment(TopNewsesFragment.newInstance(), "top");
         viewPager.setAdapter(pagerAdapter);
     }
 
@@ -145,8 +152,8 @@ public class NewsActivity extends BaseActivity
     @Override
     public void onDialogPositiveClick(DialogFragment dialog) {
         Fragment fragment = ((PagerAdapter) viewPager.getAdapter()).getFragmentByPos(0);
-        if (fragment instanceof RetrofitFragment) {
-            ((RetrofitFragment) fragment).updateContent();
+        if (fragment instanceof NewsFragment) {
+            ((NewsFragment) fragment).updateContent();
         }
     }
 

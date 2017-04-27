@@ -46,6 +46,7 @@ public class ArticleViewHolder extends RecyclerView.ViewHolder
     private ImageView ivArticleImage;
     private TextView tvArticleDesc;
     private ImageView ivLike;
+    private TextView tvLikesCount;
 
     private FloatingActionMenu floatingActionMenu;
     private FloatingActionButton fabShareByApp;
@@ -54,7 +55,6 @@ public class ArticleViewHolder extends RecyclerView.ViewHolder
 
     private SQLiteDatabase sqLiteDatabase;
     private SqLiteDbHelper sqLiteDbHelper;
-    private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
     private FirebaseDatabase firebaseDatabase;
     private RecyclerView.Adapter adapter;
@@ -83,6 +83,7 @@ public class ArticleViewHolder extends RecyclerView.ViewHolder
         tvArticleDesc = (TextView) itemView.findViewById(R.id.tv_article_desc);
         ivArticleImage = (ImageView) itemView.findViewById(R.id.iv_article_image);
         ivLike = (ImageView) itemView.findViewById(R.id.iv_like);
+        tvLikesCount = (TextView) itemView.findViewById(R.id.tv_likes_count);
 
         if (imageWidth == 0) {
             imageWidth = Prefs.getDisplayWidth();
@@ -97,14 +98,23 @@ public class ArticleViewHolder extends RecyclerView.ViewHolder
         tvArticleTitle.setText(article.getTitle());
         tvArticleDesc.setText(article.getDescription());
 
+        FirebaseNewsManager.getLikesCount(article.getArticleId(), new FirebaseNewsManager.OnResultListener() {
+            @Override
+            public void onResult(long count) {
+                tvLikesCount.setText(count + "");
+            }
+        });
+
         Glide.with(itemView.getContext()).load(article.getUrlToImage()).dontAnimate()
                 .skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.RESULT)
                 .override(imageWidth, imageHeight).centerCrop().into(ivArticleImage);
+
         if (!article.isLiked()) {
             ivLike.setImageResource(R.drawable.ic_favorite_border_black_24dp);
         } else {
             ivLike.setImageResource(R.drawable.ic_favorite_black_24dp);
         }
+
 
         ivLike.setOnClickListener(this);
         fabShareByFacebook.setOnClickListener(this);
@@ -126,7 +136,7 @@ public class ArticleViewHolder extends RecyclerView.ViewHolder
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.menu_share_by_app:
-                if(Prefs.getLoggedType()==Prefs.FACEBOOK_LOGIN) {
+                if (Prefs.getLoggedType() == Prefs.FACEBOOK_LOGIN) {
                     FirebaseNewsManager.pushNews(article);
                     Bundle args = new Bundle();
                     args.putString(CommentToNews.ARG_NEWS_ID, article.getArticleId());
@@ -138,7 +148,7 @@ public class ArticleViewHolder extends RecyclerView.ViewHolder
                     itemView.getContext().startActivity(intent);
                     floatingActionMenu.close(false);
                     return;
-                }else{
+                } else {
                     Toast.makeText(view.getContext(), R.string.share_available_for_facebook_users, Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -173,28 +183,31 @@ public class ArticleViewHolder extends RecyclerView.ViewHolder
         }
     }
 
-    private void likeNews(News.Article article){
+    private void likeNews(final News.Article article) {
         if (firebaseAuth.getCurrentUser() != null) {
             if (!article.isLiked()) {
-                databaseReference = firebaseDatabase.getReference("news");
-                databaseReference.child(article.getArticleId()).setValue(article.toMap());
 
-                databaseReference = firebaseDatabase.getReference("users");
-                databaseReference.child(firebaseAuth.getCurrentUser().getUid()).child("liked-news")
-                        .child(article.getArticleId()).setValue("true");
-
-                article.setLiked(true);
-                sqLiteDbHelper.addLikedNews(sqLiteDatabase, article.getArticleId());
-                adapter.notifyItemChanged(getAdapterPosition());
+                FirebaseNewsManager.likeNews(article, new FirebaseNewsManager.OnSuccessListener() {
+                    @Override
+                    public void onSuccess() {
+                        article.setLiked(true);
+                        sqLiteDbHelper.addLikedNews(sqLiteDatabase, article.getArticleId());
+                        adapter.notifyItemChanged(getAdapterPosition());
+                    }
+                });
 
             } else {
 
-                article.setLiked(false);
-                databaseReference = FirebaseDatabase.getInstance()
-                        .getReference("users/" + firebaseAuth.getCurrentUser().getUid() + "/liked-news");
-                databaseReference.child(article.getArticleId()).removeValue();
-                sqLiteDbHelper.removeLikedNews(sqLiteDatabase, article.getArticleId());
-                adapter.notifyItemChanged(getAdapterPosition());
+                FirebaseNewsManager.unlikeNews(article, new FirebaseNewsManager.OnSuccessListener() {
+                    @Override
+                    public void onSuccess() {
+                        article.setLiked(false);
+                        sqLiteDbHelper.removeLikedNews(sqLiteDatabase, article.getArticleId());
+                        adapter.notifyItemChanged(getAdapterPosition());
+
+                    }
+                });
+
 
             }
         }

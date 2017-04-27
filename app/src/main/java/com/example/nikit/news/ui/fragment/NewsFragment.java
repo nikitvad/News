@@ -7,21 +7,15 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.example.nikit.news.Constants;
 import com.example.nikit.news.R;
 import com.example.nikit.news.database.DatabaseManager;
 import com.example.nikit.news.database.SqLiteDbHelper;
@@ -32,17 +26,14 @@ import com.example.nikit.news.util.NetworkUtil;
 import com.example.nikit.news.util.Prefs;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RetrofitFragment extends Fragment {
+public class NewsFragment extends Fragment {
     private RecyclerView rvNews;
     private NewsRvAdapter newsRvAdapter;
     //private SharedPreferences preferences;
@@ -55,7 +46,7 @@ public class RetrofitFragment extends Fragment {
 
     private Button btFilter;
 
-    public RetrofitFragment() {
+    public NewsFragment() {
     }
 
     @Override
@@ -65,7 +56,7 @@ public class RetrofitFragment extends Fragment {
         sqLiteDbHelper = new SqLiteDbHelper(getContext());
         //preferences = container.getContext().getSharedPreferences(
         //        container.getContext().getPackageName(), container.getContext().MODE_PRIVATE);
-        return inflater.inflate(R.layout.fragment_retrofit, container, false);
+        return inflater.inflate(R.layout.news_retrofit, container, false);
     }
 
     @Override

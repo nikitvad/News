@@ -76,6 +76,11 @@ public class NewsRvAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
         }
     }
 
+    public void addArticle(News.Article article){
+        articles.add(article);
+        notifyDataSetChanged();
+    }
+
     public boolean addArticles(ArrayList<News.Article> newArticles) {
         if (newArticles.size() > 0) {
             articles.addAll(newArticles);

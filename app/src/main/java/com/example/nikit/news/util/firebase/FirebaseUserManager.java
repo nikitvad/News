@@ -67,9 +67,9 @@ public class FirebaseUserManager {
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                GenericTypeIndicator<HashMap<String, String>> t = new GenericTypeIndicator<HashMap<String, String>>() {
+                GenericTypeIndicator<HashMap<String, Long>> t = new GenericTypeIndicator<HashMap<String, Long>>() {
                 };
-                HashMap<String, String> likedNewsIds;
+                HashMap<String, Long> likedNewsIds;
                 likedNewsIds = dataSnapshot.child("liked-news").getValue(t);
                 sqLiteDbHelper.clearLikedNewsTable(database);
                 if (likedNewsIds != null && likedNewsIds.size() > 0) {

@@ -89,7 +89,7 @@ public class NewsFromFriendsFragment extends Fragment {
 
         adapter.clearData();
         LoadNewsesFromFriends loadNewsesFromFriends = new LoadNewsesFromFriends();
-        loadNewsesFromFriends.loadAll(new LoadNewsesFromFriends.OnProgressListener() {
+        loadNewsesFromFriends.loadAll(new LoadNewsesFromFriends.OnSharedNewsProgressListener() {
             @Override
             public void onProgress(SharedNews sharedNews) {
                 adapter.addShareNews(sharedNews);

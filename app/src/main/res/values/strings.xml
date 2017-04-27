@@ -69,5 +69,8 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
     <!--string name="default_web_client_id">AIzaSyCAzMJfVF_0Vh4Z_oyGQx5oiwGWnTMg_rs</string-->
 </resources>

@@ -1,6 +1,7 @@
 package com.example.nikit.news.util.firebase;
 
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.example.nikit.news.entities.News;
 import com.example.nikit.news.entities.facebook.User;
@@ -29,19 +30,13 @@ public class LoadNewsesFromFriends {
     private FirebaseDatabase database;
     private FirebaseAuth firebaseAuth;
 
-    public LoadNewsesFromFriends(@Nullable OnProgressListener listener) {
-        database = FirebaseDatabase.getInstance();
-        firebaseAuth = FirebaseAuth.getInstance();
-        //mListener = listener;
-
-    }
 
     public LoadNewsesFromFriends() {
         database = FirebaseDatabase.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
     }
 
-    public void loadAll(final OnProgressListener mListener) {
+    public void loadAll(final OnSharedNewsProgressListener mListener) {
         if (firebaseAuth.getCurrentUser() == null) {
             return;
         }
@@ -68,29 +63,30 @@ public class LoadNewsesFromFriends {
                     final Map.Entry<String, HashMap<String, SharedNews>> pair = iterator.next();
 
 
-                    new FirebaseLoadNews(new FirebaseLoadNews.OnProgressListener() {
-                        @Override
-                        public void onProgress(News.Article article) {
-                            final SharedNews sharedNews = pair.getValue().get(article.getArticleId());
-
-                            sharedNews.setArticle(article);
-                            new LoadUserInfo(new LoadUserInfo.OnCompleteListener() {
+                    new FirebaseLoadNews().load(pair.getValue().keySet(),
+                            new FirebaseLoadNews.OnProgressListener() {
                                 @Override
-                                public void onComplete(User user) {
-                                    sharedNews.setUser(user);
-                                    if (mListener != null) {
-                                        mListener.onProgress(sharedNews);
-                                        if (sharedNews.getNewsType().equals(SharedNews.NEWS_TYPE_NEW)) {
-                                            dataSnapshot.getRef().child(user.getId()).child(sharedNews.getNewsId())
-                                                    .child("newsType").setValue(SharedNews.NEWS_TYPE_DEF);
+                                public void onProgress(News.Article article) {
+                                    final SharedNews sharedNews = pair.getValue().get(article.getArticleId());
+
+                                    sharedNews.setArticle(article);
+                                    new LoadUserInfo(new LoadUserInfo.OnCompleteListener() {
+                                        @Override
+                                        public void onComplete(User user) {
+                                            sharedNews.setUser(user);
+                                            if (mListener != null) {
+                                                mListener.onProgress(sharedNews);
+                                                if (sharedNews.getNewsType().equals(SharedNews.NEWS_TYPE_NEW)) {
+                                                    dataSnapshot.getRef().child(user.getId()).child(sharedNews.getNewsId())
+                                                            .child("newsType").setValue(SharedNews.NEWS_TYPE_DEF);
+                                                }
+                                            }
+
                                         }
-                                    }
+                                    }).load(pair.getKey());
 
                                 }
-                            }).load(pair.getKey());
-
-                        }
-                    }).load(pair.getValue().keySet());
+                            });
 
                 }
 
@@ -103,53 +99,10 @@ public class LoadNewsesFromFriends {
         });
     }
 
-    public void loadNew() {
-        final DatabaseReference referenceToNew = database.getReference("users/" + firebaseAuth.getCurrentUser().getUid());
-        HashMap<String, String> newsIdOwnerId = new HashMap<>();
 
-        referenceToNew.child("news-of-friends/new").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                if (dataSnapshot.getValue() != null) {
-                    HashMap<String, String> hashMap = new HashMap<String, String>();
-                    GenericTypeIndicator<HashMap<String, String>> t = new GenericTypeIndicator<HashMap<String, String>>() {
-                    };
 
-                    hashMap = dataSnapshot.getValue(t);
-                    Iterator<Map.Entry<String, String>> iterator = hashMap.entrySet().iterator();
-
-                    while (iterator.hasNext()) {
-                        Map.Entry<String, String> pair = iterator.next();
-
-                        referenceToNew.child("news-of-friends/all").child(pair.getValue())
-                                .child(pair.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
-
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                if (dataSnapshot.getValue() != null) {
-                                    SharedNews sharedNews = dataSnapshot.getValue(SharedNews.class);
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    public interface OnProgressListener {
+    public interface OnSharedNewsProgressListener {
         void onProgress(SharedNews sharedNews);
     }
 }

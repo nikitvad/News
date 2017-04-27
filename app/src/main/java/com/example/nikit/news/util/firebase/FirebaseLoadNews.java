@@ -4,39 +4,89 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.example.nikit.news.entities.News;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_LIKED_NEWS;
+import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_LIKES;
+import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_LIKES_COUNT;
+import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_NEWS;
 
 /**
  * Created by nikit on 16.04.2017.
  */
 
 public class FirebaseLoadNews {
-    private OnProgressListener mListener;
+    private static FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private static FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
-    public FirebaseLoadNews(@Nullable OnProgressListener mListener) {
-        this.mListener = mListener;
+
+    public static void loadTopNewses(final OnProgressListener listener) {
+        DatabaseReference reference = database.getReference(FB_REF_NEWS);
+
+        Query topNewses = reference.orderByChild(FB_REF_LIKES_COUNT).limitToLast(20);
+
+        topNewses.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d("top_newses", dataSnapshot.toString());
+
+                if (dataSnapshot.getValue() != null) {
+                    GenericTypeIndicator<HashMap<String, News.Article>> t = new GenericTypeIndicator<HashMap<String, News.Article>>() {
+                    };
+
+                    HashMap<String, News.Article> hashMap = dataSnapshot.getValue(t);
+                    Log.d("top_newses", hashMap.toString());
+
+                    for (final News.Article item : hashMap.values()) {
+                        FirebaseNewsManager.isLikedCurrentUser(item.getArticleId(), new FirebaseNewsManager.OnResultListener() {
+                            @Override
+                            public void onResult(long count) {
+                                item.setLiked(count > 0 ? true : false);
+                                listener.onProgress(item);
+                            }
+                        });
+                    }
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
-    public void load(Set<String> newsIds) {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("news");
+    public static void load(Set<String> newsIds, @Nullable final OnProgressListener mListener) {
+        DatabaseReference reference = database.getReference("news");
 
         for (String newsId : newsIds) {
             reference.child(newsId).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     News.Article article = dataSnapshot.getValue(News.Article.class);
-                    Log.d("getNewsesOfFriendsss", dataSnapshot.toString());
-                    if (mListener != null && article!=null) {
-                        mListener.onProgress(article);
+
+                    if (dataSnapshot.child(FB_REF_LIKES).hasChild(firebaseAuth.getCurrentUser().getUid())) {
+                        article.setLiked(true);
+                    } else {
+                        article.setLiked(false);
                     }
+                    mListener.onProgress(article);
                 }
 
                 @Override
@@ -46,6 +96,47 @@ public class FirebaseLoadNews {
             });
         }
 
+    }
+
+    public static void loadFavorites(final OnFavoriteNewsProgressListener listener) {
+        DatabaseReference reference = database.getReference("users/" + firebaseAuth.getCurrentUser().getUid());
+
+        reference.child(FB_REF_LIKED_NEWS).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue() != null) {
+                    Log.d("loadFavorites", dataSnapshot.toString());
+                    GenericTypeIndicator<HashMap<String, Long>> t = new GenericTypeIndicator<HashMap<String, Long>>() {
+                    };
+                    HashMap<String, Long> hashMap = dataSnapshot.getValue(t);
+                    Log.d("loadFavorites", hashMap.toString());
+
+                    Iterator<Map.Entry<String, Long>> iterator = hashMap.entrySet().iterator();
+
+                    new FirebaseLoadNews().load(hashMap.keySet(), new FirebaseLoadNews.OnProgressListener() {
+                        @Override
+                        public void onProgress(News.Article article) {
+                            //article.setLiked(true);
+                            if (listener != null) {
+                                listener.onProgress(article);
+                                Log.d("loadFavorites", article.toString());
+                            }
+                        }
+                    });
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    public interface OnFavoriteNewsProgressListener {
+        void onProgress(News.Article article);
 
     }
 

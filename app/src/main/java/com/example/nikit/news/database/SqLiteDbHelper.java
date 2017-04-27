@@ -219,7 +219,7 @@ public class SqLiteDbHelper extends SQLiteOpenHelper {
                 new String[]{newsId});
     }
 
-    public void addAllLikedNewses(SQLiteDatabase db, HashMap<String, String> newsIds) {
+    public void addAllLikedNewses(SQLiteDatabase db, HashMap<String, Long> newsIds) {
 
         ContentValues contentValues;
         for (String item : newsIds.keySet()) {

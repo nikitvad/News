@@ -1,8 +1,12 @@
 package com.example.nikit.news.entities;
 
 
+import com.example.nikit.news.util.firebase.FirebaseConstants;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_LIKES_COUNT;
 
 /**
  * Created by nikit on 12.03.2017.
@@ -73,6 +77,16 @@ public class News {
         private String urlToImage;
         private String publishedAt;
         private CharSequence source;
+        private long likesCount;
+
+        public long getLikesCount() {
+            return likesCount;
+        }
+
+        public void setLikesCount(long likesCount) {
+            this.likesCount = likesCount;
+        }
+
         private boolean liked = false;
 
         public String getArticleId() {
@@ -91,6 +105,8 @@ public class News {
         public void setLiked(boolean liked) {
             this.liked = liked;
         }
+
+
 
         public CharSequence getSource() {
             return source;
@@ -155,12 +171,15 @@ public class News {
         @Override
         public String toString() {
             return "Article{" +
-                    "author='" + author + '\'' +
+                    "articleId='" + articleId + '\'' +
+                    ", author='" + author + '\'' +
                     ", title='" + title + '\'' +
                     ", description='" + description + '\'' +
                     ", url='" + url + '\'' +
                     ", urlToImage='" + urlToImage + '\'' +
                     ", publishedAt='" + publishedAt + '\'' +
+                    ", source=" + source +
+                    ", liked=" + liked +
                     '}';
         }
 
@@ -171,6 +190,7 @@ public class News {
             hashMap.put("url", url);
             hashMap.put("urlToImage", urlToImage);
             hashMap.put("publishedAt", publishedAt);
+            hashMap.put(FB_REF_LIKES_COUNT, 0);
             hashMap.put("author", author);
 
             return hashMap;
