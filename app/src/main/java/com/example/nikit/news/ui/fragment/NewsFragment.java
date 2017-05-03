@@ -1,21 +1,25 @@
 package com.example.nikit.news.ui.fragment;
 
 
-import android.app.ActionBar;
 //import android.content.SharedPreferences;
+
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.example.nikit.news.HidingScrollListener;
 import com.example.nikit.news.R;
 import com.example.nikit.news.database.DatabaseManager;
 import com.example.nikit.news.database.SqLiteDbHelper;
@@ -24,6 +28,7 @@ import com.example.nikit.news.ui.adapter.NewsRvAdapter;
 import com.example.nikit.news.ui.dialog.FilterDialog;
 import com.example.nikit.news.util.NetworkUtil;
 import com.example.nikit.news.util.Prefs;
+import com.example.nikit.news.util.sdf;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -36,7 +41,6 @@ import java.util.Set;
 public class NewsFragment extends Fragment {
     private RecyclerView rvNews;
     private NewsRvAdapter newsRvAdapter;
-    //private SharedPreferences preferences;
     private SwipeRefreshLayout swipeRefreshLayout;
 
     private LoadNewsAsyncTask newsAsyncTask;
@@ -62,7 +66,7 @@ public class NewsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (newsRvAdapter.getItemCount() == 0) {
+        if (newsRvAdapter.getItemCount() == 1) {
             updateContent();
         }
     }
@@ -70,29 +74,6 @@ public class NewsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        rvNews = (RecyclerView) view.findViewById(R.id.rv_articles);
-        rvNews.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                ActionBar ab = getActivity().getActionBar();
-                super.onScrollStateChanged(recyclerView, newState);
-
-            }
-        });
-
-        newsRvAdapter = new NewsRvAdapter(this);
-        rvNews.setAdapter(newsRvAdapter);
-        rvNews.setLayoutManager(new LinearLayoutManager(view.getContext()));
-
-        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                updateContent();
-                swipeRefreshLayout.setRefreshing(true);
-            }
-        });
-
 
         btFilter = (Button) view.findViewById(R.id.bt_filter);
         btFilter.setOnClickListener(new View.OnClickListener() {
@@ -102,18 +83,51 @@ public class NewsFragment extends Fragment {
             }
         });
 
+        rvNews = (RecyclerView) view.findViewById(R.id.rv_articles);
+
+        newsRvAdapter = new NewsRvAdapter(this);
+        rvNews.setAdapter(newsRvAdapter);
+        rvNews.setLayoutManager(new LinearLayoutManager(view.getContext()));
+
+        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        TabLayout tabLayout = (TabLayout) getActivity().findViewById(R.id.tab_layout);
+        rvNews.addOnScrollListener(new HidingScrollListener(toolbar, tabLayout, btFilter));
+
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
+        swipeRefreshLayout.setProgressViewOffset(false, toolbar.getHeight()*2, 100);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                updateContent();
+                swipeRefreshLayout.setRefreshing(true);
+            }
+        });
+
+
+
+
     }
 
     public void updateContent() {
         if (isAdded()) {
-            if (newsAsyncTask != null && !newsAsyncTask.isCancelled()) {
-                newsAsyncTask.cancel(true);
+            if (NetworkUtil.isNetworkAvailable(getActivity())) {
+                if (newsAsyncTask != null && !newsAsyncTask.isCancelled()) {
+                    newsAsyncTask.cancel(true);
+                }
+                newsRvAdapter.clearData();
+                newsAsyncTask = new LoadNewsAsyncTask();
+                newsAsyncTask.execute();
+            } else if (newsRvAdapter.getItemCount() < 1) {
+                new LoadArticlesFromDbAsync().execute();
             }
-            newsAsyncTask = new LoadNewsAsyncTask();
-            newsAsyncTask.execute();
         }
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        new SaveNewsesToDatabaseAsync().execute();
+    }
 
     class LoadNewsAsyncTask extends AsyncTask<Void, News, Void> {
         private Set<String> sourceIds;
@@ -129,7 +143,8 @@ public class NewsFragment extends Fragment {
         @Override
         protected void onPostExecute(Void aVoid) {
             DatabaseManager.getInstance().closeDatabase();
-            new LoadArticlesFromDbAsync().execute();
+            swipeRefreshLayout.setRefreshing(false);
+            // new LoadArticlesFromDbAsync().execute();
         }
 
         @Override
@@ -141,10 +156,10 @@ public class NewsFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... voids) {
 
-            if (getActivity()!=null && NetworkUtil.isNetworkAvailable(getActivity())) {
+            if (getActivity() != null && NetworkUtil.isNetworkAvailable(getActivity())) {
 
                 if (sourceIds.size() > 0) {
-                    sqLiteDbHelper.clearNewsTable(database);
+                    //  sqLiteDbHelper.clearNewsTable(database);
                 } else {
                     return null;
                 }
@@ -153,8 +168,21 @@ public class NewsFragment extends Fragment {
                     String sourceId = iterator.next();
                     News news = NetworkUtil.getNewsFromSource(sourceId, "top");
 
-                    if (news != null && news.getArticlesCount() > 0) {
-                        sqLiteDbHelper.insertArticles(database, news.getArticles());
+                    if (news != null && news.getArticles().size() > 0) {
+
+                        for (News.Article item : news.getArticles()) {
+                            if (sqLiteDbHelper.isLikedNewsContain(database, item.getArticleId())) {
+                                item.setLiked(true);
+                            } else {
+                                item.setLiked(false);
+                            }
+                        }
+
+                        publishProgress(news);
+
+                        if (news != null && news.getArticlesCount() > 0) {
+                            //    sqLiteDbHelper.insertArticles(database, news.getArticles());
+                        }
                     }
                 }
 
@@ -171,6 +199,7 @@ public class NewsFragment extends Fragment {
         }
     }
 
+
     class LoadArticlesFromDbAsync extends AsyncTask<Void, Void, Void> {
         private ArrayList<News.Article> articles;
 
@@ -185,12 +214,6 @@ public class NewsFragment extends Fragment {
                 newsRvAdapter.swapData(articles);
             }
             DatabaseManager.getInstance().closeDatabase();
-            swipeRefreshLayout.setRefreshing(false);
-        }
-
-        @Override
-        protected void onCancelled() {
-            swipeRefreshLayout.setRefreshing(false);
         }
 
         @Override
@@ -199,4 +222,103 @@ public class NewsFragment extends Fragment {
             return null;
         }
     }
+
+    class SaveNewsesToDatabaseAsync extends AsyncTask<Void, Void, Void> {
+        private SQLiteDatabase database;
+        private SqLiteDbHelper dbHelper;
+
+        @Override
+        protected void onPreExecute() {
+            dbHelper = new SqLiteDbHelper(getContext());
+            database = DatabaseManager.getInstance().openDatabase();
+
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            dbHelper = null;
+            DatabaseManager.getInstance().closeDatabase();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            if (newsRvAdapter.getItemCount() > 0) {
+                dbHelper.clearNewsTable(database);
+                dbHelper.insertArticles(database, newsRvAdapter.getArticles());
+            }
+
+            return null;
+        }
+    }
+
+
+    class LoadNextNewsAsyncTask extends AsyncTask<Void, News, Void> {
+        private Set<String> sourceIds;
+
+
+        @Override
+        protected void onPreExecute() {
+            sourceIds = Prefs.getSourcesFilter();
+            database = DatabaseManager.getInstance().openDatabase();
+            swipeRefreshLayout.setRefreshing(true);
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            DatabaseManager.getInstance().closeDatabase();
+            swipeRefreshLayout.setRefreshing(false);
+        }
+
+        @Override
+        protected void onCancelled() {
+            swipeRefreshLayout.setRefreshing(false);
+            DatabaseManager.getInstance().closeDatabase();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            if (getActivity() != null && NetworkUtil.isNetworkAvailable(getActivity())) {
+
+                if (sourceIds.size() > 0) {
+                    //  sqLiteDbHelper.clearNewsTable(database);
+                } else {
+                    return null;
+                }
+                Iterator<String> iterator = sourceIds.iterator();
+                while (iterator.hasNext()) {
+                    String sourceId = iterator.next();
+                    News news = NetworkUtil.getNewsFromSource(sourceId, "top");
+
+                    if (news != null && news.getArticles().size() > 0) {
+
+                        for (News.Article item : news.getArticles()) {
+                            if (sqLiteDbHelper.isLikedNewsContain(database, item.getArticleId())) {
+                                item.setLiked(true);
+                            } else {
+                                item.setLiked(false);
+                            }
+                        }
+
+                        publishProgress(news);
+
+                        if (news != null && news.getArticlesCount() > 0) {
+                            //    sqLiteDbHelper.insertArticles(database, news.getArticles());
+                        }
+                    }
+                }
+
+            } else {
+                return null;
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(News... values) {
+            newsRvAdapter.addArticles(values[0].getArticles());
+        }
+    }
+
 }

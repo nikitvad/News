@@ -14,12 +14,25 @@
         <activity android:name=".ui.activity.NewsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".ui.activity.NewsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.nikit.news.ui.activity.NewsActivity" />
+        </activity>
+
         <activity android:name=".ui.activity.LoginActivity" />
-        <activity android:name=".ui.activity.WebViewActivity" />
+        <activity android:name=".ui.activity.WebViewActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.nikit.news.ui.activity.NewsActivity" />
+        </activity>
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
@@ -39,12 +52,16 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        <service android:name=".services.NewsFromFriendsService"></service>
+        <service android:name=".services.NewsFromFriendsService" />
 
         <activity android:name=".ui.activity.ShareByApp" />
-        <activity
-            android:name=".ui.SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
+
+
+        <activity android:name=".ui.activity.AdditionalNewses">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.nikit.news.ui.activity.NewsActivity"/>
+        </activity>
     </application>
 
 </manifest>

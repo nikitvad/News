@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 
@@ -19,10 +20,11 @@ import java.util.ArrayList;
  * Created by nikit on 14.03.2017.
  */
 
-public class NewsRvAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
+public class NewsRvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    public static final int TYPE_HEADER = 1;
+    public static final int TYPE_ITEM = 2;
     private final ArrayList<News.Article> articles;
     private Fragment fragment;
-
     private int imageHeight = 720;
     private int imageWidth = 480;
 
@@ -42,27 +44,41 @@ public class NewsRvAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
         Resources r = recyclerView.getResources();
-
         imageWidth = r.getDisplayMetrics().widthPixels;
-        imageHeight = (int)(imageWidth/1.77);
+        imageHeight = (int) (imageWidth / 1.77);
     }
 
     @Override
-    public ArticleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        return new ArticleViewHolder(inflater.inflate(R.layout.article_item, parent, false), this, fragment);
+        if (viewType == TYPE_ITEM) {
+            return new ArticleViewHolder(inflater.inflate(R.layout.article_item, parent, false), this, fragment);
+        } else if (viewType == TYPE_HEADER) {
+            final View view = inflater.inflate(R.layout.recycler_view_header, parent, false);
+            return new RecyclerHeaderViewHolder(view);
+        }
+        return null;
     }
 
     @Override
-    public void onBindViewHolder(ArticleViewHolder holder, int position) {
-        if (articles != null) {
-            holder.bindArticle(articles.get(position));
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        if (position != 0) {
+            ((ArticleViewHolder) holder).bindArticle(articles.get(position - 1));
         }
     }
 
     @Override
+    public int getItemViewType(int position) {
+        if (position == 0) {
+            return TYPE_HEADER;
+        }
+        return TYPE_ITEM;
+    }
+
+    @Override
     public int getItemCount() {
-        return articles.size();
+        return articles.size() + 1;
     }
 
     public boolean swapData(ArrayList<News.Article> newDataList) {
@@ -76,19 +92,36 @@ public class NewsRvAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
         }
     }
 
-    public void addArticle(News.Article article){
-        articles.add(article);
+    public ArrayList<News.Article> getArticles() {
+        return articles;
+    }
+
+    public void clearData() {
+        articles.clear();
         notifyDataSetChanged();
+    }
+
+    public void addArticle(News.Article article) {
+        articles.add(article);
+        notifyItemInserted(getItemCount());
+        //notifyDataSetChanged();
     }
 
     public boolean addArticles(ArrayList<News.Article> newArticles) {
         if (newArticles.size() > 0) {
+            int startPosition = getItemCount();
             articles.addAll(newArticles);
-            notifyDataSetChanged();
+            //notifyDataSetChanged();
+            notifyItemRangeInserted(startPosition, newArticles.size());
             return true;
         }
         return false;
     }
 
+    class RecyclerHeaderViewHolder extends RecyclerView.ViewHolder {
+        public RecyclerHeaderViewHolder(View itemView) {
+            super(itemView);
+        }
+    }
 
 }

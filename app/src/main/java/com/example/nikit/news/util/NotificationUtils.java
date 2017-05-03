@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 
 import com.example.nikit.news.R;
+import com.example.nikit.news.ui.activity.AdditionalNewses;
 import com.example.nikit.news.ui.activity.NewsActivity;
 
 import java.util.HashMap;
@@ -44,9 +45,8 @@ public class NotificationUtils {
     }
 
     public int createInfoNotification(String message){
-        Intent notificationIntent = new Intent(context, NewsActivity.class);
-        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        notificationIntent.putExtra(NewsActivity.FRAGMENT_TYPE_KEY, NewsActivity.SHARED_NEWS_FRAGMENT_TYPE);
+        Intent notificationIntent = new Intent(context, AdditionalNewses.class);
+        notificationIntent.putExtra(AdditionalNewses.KEY_FRAGMENT_TYPE, AdditionalNewses.FRAG_TYPE_NEWS_FROM_FRIENDS);
         NotificationCompat.Builder nb = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.com_facebook_button_icon)
                 .setAutoCancel(true)

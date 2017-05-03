@@ -63,35 +63,34 @@ public class NewsesFromFriendsRvAdapter extends RecyclerView.Adapter<RecyclerVie
     public void addShareNews(SharedNews news) {
         if (news.getNewsType().equals(SharedNews.NEWS_TYPE_DEF)) {
             if (oldNewsesCount > -1) {
-                items.add(newNewsesCount + 2, news);
-                notifyItemInserted(newNewsesCount + 2);
+                items.add(newNewsesCount + oldNewsesCount + 2, news);
+                notifyItemInserted(newNewsesCount + oldNewsesCount + 2);
                 oldNewsesCount++;
             } else {
-                items.add(newNewsesCount + 1, new GroupTitle("old"));
+                items.add(newNewsesCount + 1, new GroupTitle("All"));
                 notifyItemInserted(newNewsesCount + 1);
-                oldNewsesCount = 0;
+                oldNewsesCount = 1;
                 items.add(newNewsesCount + 2, news);
                 notifyItemInserted(newNewsesCount + 2);
             }
         } else {
             if (newNewsesCount > -1) {
-                items.add(1, news);
+                items.add(newNewsesCount + 1, news);
                 notifyItemInserted(1);
                 newNewsesCount++;
             } else {
                 items.add(0, new GroupTitle("new"));
                 notifyItemInserted(0);
-                newNewsesCount=0;
                 items.add(1, news);
                 notifyItemInserted(1);
-                newNewsesCount++;
+                newNewsesCount = 1;
             }
         }
     }
 
-    public void clearData(){
-        newNewsesCount=-1;
-        oldNewsesCount=-1;
+    public void clearData() {
+        newNewsesCount = -1;
+        oldNewsesCount = -1;
         items.clear();
         notifyDataSetChanged();
     }

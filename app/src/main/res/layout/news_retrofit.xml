@@ -17,8 +17,11 @@
 
         <Button
             android:id="@+id/bt_filter"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:background="@drawable/rounded_button"
+            android:layout_height="40dp"
             android:layout_alignParentBottom="true"
             android:text="filter" />
     </RelativeLayout>

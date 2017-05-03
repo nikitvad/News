@@ -1,5 +1,6 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipe_refresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.nikit.news.ui.fragment.NewsFromFriendsFragment">
@@ -8,6 +9,6 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_news_of_friends"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
-</FrameLayout>
+</android.support.v4.widget.SwipeRefreshLayout>

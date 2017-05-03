@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -27,9 +28,8 @@ public class NewsFromFriendsFragment extends Fragment {
     private DatabaseReference reference;
     private RecyclerView recyclerView;
     private NewsesFromFriendsRvAdapter adapter;
-    private ArrayList<ListItem> items = new ArrayList<>();
+    private SwipeRefreshLayout swipeRefreshLayout;
 
-    private OnFragmentInteractionListener mListener;
 
     public NewsFromFriendsFragment() {
         // Required empty public constructor
@@ -55,15 +55,20 @@ public class NewsFromFriendsFragment extends Fragment {
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-    }
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                updateContent();
+            }
+        });
 
+    }
 
     @Override
     public void onResume() {
         super.onResume();
-
         updateContent();
-
     }
 
     @Override
@@ -73,34 +78,18 @@ public class NewsFromFriendsFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_news_of_friends, container, false);
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
     public void updateContent() {
 
+        swipeRefreshLayout.setRefreshing(true);
         adapter.clearData();
         LoadNewsesFromFriends loadNewsesFromFriends = new LoadNewsesFromFriends();
         loadNewsesFromFriends.loadAll(new LoadNewsesFromFriends.OnSharedNewsProgressListener() {
             @Override
             public void onProgress(SharedNews sharedNews) {
+                swipeRefreshLayout.setRefreshing(false);
                 adapter.addShareNews(sharedNews);
-                Log.d("sdfgsdfsdfg", sharedNews.toString());
             }
         });
 
-    }
-
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
     }
 }

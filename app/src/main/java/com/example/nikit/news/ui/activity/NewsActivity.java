@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import com.example.nikit.news.R;
 
 import com.example.nikit.news.services.NewsFromFriendsService;
+import com.example.nikit.news.ui.SettingsActivity;
 import com.example.nikit.news.ui.adapter.PagerAdapter;
 import com.example.nikit.news.ui.dialog.FilterDialog;
 import com.example.nikit.news.ui.fragment.FavoritesFragment;
@@ -56,7 +57,7 @@ public class NewsActivity extends BaseActivity
 
         viewPager = (ViewPager) findViewById(R.id.pager);
         setupViewPager(viewPager);
-        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+        tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
 
 
@@ -98,10 +99,7 @@ public class NewsActivity extends BaseActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
         //test
-
-
     }
 
     @Override
@@ -118,30 +116,34 @@ public class NewsActivity extends BaseActivity
     private void setupViewPager(ViewPager viewPager) {
         PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager());
         pagerAdapter.addFragment(new NewsFragment(), "News");
-        pagerAdapter.addFragment(NewsFromFriendsFragment.newInstance(), "friends");
-        pagerAdapter.addFragment(FavoritesFragment.newInstance("", ""), "favorites");
         pagerAdapter.addFragment(TopNewsesFragment.newInstance(), "top");
         viewPager.setAdapter(pagerAdapter);
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
+        switch (item.getItemId()) {
+            case R.id.nav_settings:
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
+                break;
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+            case R.id.nav_news_from_friends:
+                Intent newsFromFriendsIntent = new Intent(this, AdditionalNewses.class);
+                newsFromFriendsIntent.putExtra(AdditionalNewses.KEY_FRAGMENT_TYPE, AdditionalNewses.FRAG_TYPE_NEWS_FROM_FRIENDS);
+                startActivity(newsFromFriendsIntent);
+                break;
 
-        } else if (id == R.id.nav_slideshow) {
+            case R.id.nav_favorites:
+                Intent favoritesIntent = new Intent(this, AdditionalNewses.class);
+                favoritesIntent.putExtra(AdditionalNewses.KEY_FRAGMENT_TYPE, AdditionalNewses.FRAG_TYPE_FAVORITE);
+                startActivity(favoritesIntent);
+                break;
 
-        } else if (id == R.id.nav_manage) {
+            case R.id.nav_sign_out:
+                signOut();
+                break;
 
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        } else if (id == R.id.nav_sign_out) {
-            signOut();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -157,23 +159,10 @@ public class NewsActivity extends BaseActivity
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Intent intent = getIntent();
-
-        if (intent.getExtras() != null && intent.getExtras().containsKey(FRAGMENT_TYPE_KEY)) {
-            String fragmentType = intent.getExtras().getString(FRAGMENT_TYPE_KEY);
-            if (fragmentType.equals(SHARED_NEWS_FRAGMENT_TYPE)) {
-                viewPager.setCurrentItem(1);
-                intent.removeExtra(FRAGMENT_TYPE_KEY);
-            }
-        }
-    }
-
     private void signOut() {
         Intent intent = new Intent(this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
         if (Prefs.getLoggedType() == Prefs.GOOGLE_LOGIN) {
             if (googleApiClient.isConnected()) {
                 Auth.GoogleSignInApi.signOut(googleApiClient);
@@ -181,6 +170,7 @@ public class NewsActivity extends BaseActivity
                 firebaseAuth.signOut();
                 startActivity(intent);
             }
+
         } else if (Prefs.getLoggedType() == Prefs.FACEBOOK_LOGIN) {
             LoginManager.getInstance().logOut();
             firebaseAuth.signOut();
