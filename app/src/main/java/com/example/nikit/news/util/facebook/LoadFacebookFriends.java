@@ -3,7 +3,7 @@ package com.example.nikit.news.util.facebook;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.example.nikit.news.entities.facebook.User;
+import com.example.nikit.news.entities.facebook.FacebookUser;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
@@ -18,11 +18,11 @@ import java.util.ArrayList;
  * Created by nikit on 15.04.2017.
  */
 
-public class LoadUserFriends {
-    ArrayList<User> tempUserList;
+public class LoadFacebookFriends {
+    ArrayList<FacebookUser> tempFacebookUserList;
     private OnProgressListener mListener;
 
-    public LoadUserFriends(OnProgressListener mListener) {
+    public LoadFacebookFriends(OnProgressListener mListener) {
         this.mListener = mListener;
     }
 
@@ -34,9 +34,9 @@ public class LoadUserFriends {
                 new GraphRequest.GraphJSONObjectCallback() {
                     @Override
                     public void onCompleted(JSONObject object, GraphResponse response) {
-                        Log.d("LoadUserInfo", response.toString());
-                        tempUserList = FacebookUtil.getFacebookFriendsFromJson(object);
-                        for (User item : tempUserList) {
+                        Log.d("LoadFacebookUserInfo", response.toString());
+                        tempFacebookUserList = FacebookUtil.getFacebookFriendsFromJson(object);
+                        for (FacebookUser item : tempFacebookUserList) {
                             getAvatarToFriend(item);
                         }
                     }
@@ -48,23 +48,23 @@ public class LoadUserFriends {
     }
 
 
-    private void getAvatarToFriend(final User user) {
+    private void getAvatarToFriend(final FacebookUser facebookUser) {
         Bundle params = new Bundle();
         params.putBoolean("redirect", false);
 
 
         new GraphRequest(
                 AccessToken.getCurrentAccessToken(),
-                "/" + user.getId() + "/picture",
+                "/" + facebookUser.getId() + "/picture",
                 params,
                 HttpMethod.GET,
                 new GraphRequest.Callback() {
                     public void onCompleted(GraphResponse response) {
                         try {
-                            user.setUrlToAvatar(response.getJSONObject().getJSONObject("data")
+                            facebookUser.setUrlToAvatar(response.getJSONObject().getJSONObject("data")
                                     .getString("url"));
                             if (mListener != null) {
-                                mListener.onProgress(user);
+                                mListener.onProgress(facebookUser);
                             }
 
                         } catch (JSONException e) {
@@ -78,7 +78,7 @@ public class LoadUserFriends {
     }
 
     public interface OnProgressListener {
-        void onProgress(User user);
+        void onProgress(FacebookUser facebookUser);
     }
 }
 

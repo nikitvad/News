@@ -11,27 +11,17 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.activity.NewsActivity">
+        <activity android:name=".ui.activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".ui.SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:parentActivityName=".ui.activity.NewsActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.nikit.news.ui.activity.NewsActivity" />
-        </activity>
-
         <activity android:name=".ui.activity.LoginActivity" />
         <activity android:name=".ui.activity.WebViewActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.nikit.news.ui.activity.NewsActivity" />
+                android:value="com.example.nikit.news.ui.activity.MainActivity" />
         </activity>
 
         <meta-data
@@ -54,13 +44,29 @@
         </service>
         <service android:name=".services.NewsFromFriendsService" />
 
-        <activity android:name=".ui.activity.ShareByApp" />
-
-
+        <activity android:name=".ui.activity.ShareByAppActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.nikit.news.ui.activity.MainActivity" />
+        </activity>
         <activity android:name=".ui.activity.AdditionalNewses">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.nikit.news.ui.activity.NewsActivity"/>
+                android:value="com.example.nikit.news.ui.activity.MainActivity" />
+        </activity>
+        <activity android:name=".ui.activity.SettingsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.nikit.news.ui.activity.MainActivity" />
+            <intent-filter>
+                <action android:name="android.intent.action.MANAGE_NETWORK_USAGE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".ui.activity.RegistrationActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.nikit.news.ui.activity.MainActivity" />
         </activity>
     </application>
 

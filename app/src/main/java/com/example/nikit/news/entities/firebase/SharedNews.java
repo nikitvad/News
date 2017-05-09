@@ -1,7 +1,7 @@
 package com.example.nikit.news.entities.firebase;
 
 import com.example.nikit.news.entities.News;
-import com.example.nikit.news.entities.facebook.User;
+import com.example.nikit.news.entities.facebook.FacebookUser;
 import com.example.nikit.news.entities.ui.ListItem;
 
 import java.util.Date;
@@ -20,7 +20,7 @@ public class SharedNews extends ListItem {
     private String date;
     private String newsType;
     private News.Article article;
-    private User user;
+    private FacebookUser facebookUser;
 
     public String getNewsType() {
         return newsType;
@@ -35,12 +35,12 @@ public class SharedNews extends ListItem {
         newsType = NEWS_TYPE_NEW;
     }
 
-    public User getUser() {
-        return user;
+    public FacebookUser getFacebookUser() {
+        return facebookUser;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setFacebookUser(FacebookUser facebookUser) {
+        this.facebookUser = facebookUser;
     }
 
     public News.Article getArticle() {
@@ -92,7 +92,7 @@ public class SharedNews extends ListItem {
                 ", date='" + date + '\'' +
                 ", newsType='" + newsType + '\'' +
                 ", article=" + article +
-                ", user=" + user +
+                ", facebookUser=" + facebookUser +
                 '}';
     }
 

@@ -30,7 +30,7 @@
             android:inputType="textPassword" />
 
         <Button
-            android:id="@+id/bt_auth_submit"
+            android:id="@+id/bt_login_by_email"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@drawable/rounded_button"
@@ -72,6 +72,16 @@
                 android:textSize="25dp" />
 
         </LinearLayout>
+        <TextView
+            android:layout_gravity="center"
+            android:id="@+id/tv_create_account"
+            style="?borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="create acount"
+            android:textAllCaps="false"
+            />
 
     </LinearLayout>
 

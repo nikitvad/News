@@ -5,14 +5,17 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.nikit.news.R;
 import com.example.nikit.news.database.DatabaseManager;
 import com.example.nikit.news.database.SqLiteDbHelper;
+import com.example.nikit.news.entities.firebase.AppUser;
 import com.example.nikit.news.util.Prefs;
 import com.example.nikit.news.util.firebase.FirebaseUserManager;
 import com.facebook.AccessToken;
@@ -25,10 +28,7 @@ import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -37,39 +37,42 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.Arrays;
-import java.util.HashMap;
 
-public class LoginActivity extends AppCompatActivity{
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int RC_SIGN_IN = 9001;
 
+    private Button btLoginByEmail;
+
     private Button btLoginByFacebook;
     private Button btLoginByGoogle;
+    private EditText etAuthEmail;
+    private EditText etAuthPassword;
+    private TextView tvCreateAccount;
 
     private CallbackManager callbackManager;
-    private FirebaseAuth firebaseAuth;
+    private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener firebaseAuthStateListener;
     private FirebaseDatabase firebaseDatabase;
     private GoogleApiClient googleApiClient;
-
-    private HashMap<String, String> likedNewsIds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        etAuthEmail = (EditText) findViewById(R.id.et_auth_email);
+        etAuthPassword = (EditText) findViewById(R.id.et_auth_pass);
+        tvCreateAccount = (TextView)findViewById(R.id.tv_create_account);
+
+        tvCreateAccount.setOnClickListener(this);
+
         //Firebase initializing
         firebaseDatabase = FirebaseDatabase.getInstance();
-        firebaseAuth = FirebaseAuth.getInstance();
+        mAuth = FirebaseAuth.getInstance();
         firebaseAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -117,7 +120,7 @@ public class LoginActivity extends AppCompatActivity{
             public void onClick(View view) {
 
                 LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this,
-                        Arrays.asList("public_profile", "user_friends", "read_custom_friendlists"));
+                        Arrays.asList("public_profile", "user_friends", "read_custom_friendlists", "email"));
 
             }
         });
@@ -129,6 +132,17 @@ public class LoginActivity extends AppCompatActivity{
             }
         });
 
+
+        btLoginByEmail = (Button) findViewById(R.id.bt_login_by_email);
+        /*btLoginByEmail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LoginActivity.this, RegistrationActivity.class);
+                startActivity(intent);
+            }
+        });
+        */
+        btLoginByEmail.setOnClickListener(this);
     }
 
 
@@ -136,7 +150,7 @@ public class LoginActivity extends AppCompatActivity{
     protected void onStart() {
         super.onStart();
 //        googleApiClient.connect();
-        firebaseAuth.addAuthStateListener(firebaseAuthStateListener);
+        mAuth.addAuthStateListener(firebaseAuthStateListener);
 
     }
 
@@ -146,7 +160,7 @@ public class LoginActivity extends AppCompatActivity{
 //        googleApiClient.disconnect();
 
         if (firebaseAuthStateListener != null) {
-            firebaseAuth.removeAuthStateListener(firebaseAuthStateListener);
+            mAuth.removeAuthStateListener(firebaseAuthStateListener);
         }
     }
 
@@ -174,7 +188,7 @@ public class LoginActivity extends AppCompatActivity{
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        firebaseAuth.signInWithCredential(credential)
+        mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -183,7 +197,9 @@ public class LoginActivity extends AppCompatActivity{
                                     Toast.LENGTH_SHORT).show();
                         } else {
                             Prefs.setLoggedType(Prefs.GOOGLE_LOGIN);
-                            Intent intent = new Intent(LoginActivity.this, NewsActivity.class);
+                            AppUser user = new AppUser(mAuth.getCurrentUser());
+                            FirebaseUserManager.pushUserInfo_v2(user);
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
                         }
@@ -192,19 +208,41 @@ public class LoginActivity extends AppCompatActivity{
 
     }
 
+    private void signInByEmail(String email, String password) {
+        if (!validateForm()) {
+            return;
+        }
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+                        } else {
+                            Toast.makeText(LoginActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
     private void handleFacebookAccessToken(final AccessToken token) {
 
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
-        firebaseAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        mAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (!task.isSuccessful()) {
                     Toast.makeText(LoginActivity.this, "Authentication failed.",
                             Toast.LENGTH_SHORT).show();
                 } else {
-                    FirebaseUserManager.pushUserInfo();
+                    //FirebaseUserManager.pushUserInfo();
+                    AppUser user = new AppUser(mAuth.getCurrentUser());
+                    FirebaseUserManager.pushUserInfo_v2(user);
                     Prefs.setLoggedType(Prefs.FACEBOOK_LOGIN);
-                    Intent intent = new Intent(LoginActivity.this, NewsActivity.class);
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 }
@@ -214,6 +252,28 @@ public class LoginActivity extends AppCompatActivity{
 
     }
 
+    private boolean validateForm() {
+        boolean valid = true;
+
+        String email = etAuthEmail.getText().toString();
+        if (TextUtils.isEmpty(email)) {
+            etAuthEmail.setError("Required.");
+            valid = false;
+        } else {
+            etAuthEmail.setError(null);
+        }
+
+        String password = etAuthPassword.getText().toString();
+        if (TextUtils.isEmpty(password)) {
+            etAuthPassword.setError("Required.");
+            valid = false;
+        } else {
+            etAuthPassword.setError(null);
+        }
+
+        return valid;
+    }
+
     private void removeUserData() {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
         SqLiteDbHelper dbHelper = new SqLiteDbHelper(getApplicationContext());
@@ -221,4 +281,17 @@ public class LoginActivity extends AppCompatActivity{
         DatabaseManager.getInstance().closeDatabase();
     }
 
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.bt_login_by_email:
+                signInByEmail(etAuthEmail.getText().toString(), etAuthPassword.getText().toString());
+            break;
+            case R.id.tv_create_account:
+                Intent intent = new Intent(LoginActivity.this, RegistrationActivity.class);
+                startActivity(intent);
+                break;
+
+        }
+    }
 }

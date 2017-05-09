@@ -5,12 +5,13 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.Nullable;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
+import com.example.nikit.news.Constants;
 import com.example.nikit.news.R;
 import com.example.nikit.news.ui.activity.AdditionalNewses;
-import com.example.nikit.news.ui.activity.NewsActivity;
 
 import java.util.HashMap;
 
@@ -21,6 +22,8 @@ import java.util.HashMap;
 public class NotificationUtils {
 
     private static final String TAG = NotificationUtils.class.getSimpleName();
+
+    public static SharedPreferences sharedPreferences;
 
     private static NotificationUtils instance;
 
@@ -33,6 +36,7 @@ public class NotificationUtils {
         this.context = context;
         manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notifications = new HashMap<Integer, Notification>();
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     public static NotificationUtils getInstance(Context context) {
@@ -44,7 +48,7 @@ public class NotificationUtils {
         return instance;
     }
 
-    public int createInfoNotification(String message){
+    public int createInfoNotification(String message) {
         Intent notificationIntent = new Intent(context, AdditionalNewses.class);
         notificationIntent.putExtra(AdditionalNewses.KEY_FRAGMENT_TYPE, AdditionalNewses.FRAG_TYPE_NEWS_FROM_FRIENDS);
         NotificationCompat.Builder nb = new NotificationCompat.Builder(context)
@@ -54,18 +58,23 @@ public class NotificationUtils {
                 .setContentText(message)
                 .setContentIntent(PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT))
                 .setWhen(System.currentTimeMillis())
-                .setContentTitle("AppName")
-                .setDefaults(Notification.DEFAULT_ALL);
+                .setContentTitle("AppName");
+
+        if (sharedPreferences.getBoolean(Constants.PREF_KEY_NOTIFICATIONS_SOUND, false)) {
+            if (sharedPreferences.getBoolean(Constants.PREF_KEY_NOTIFICATIONS_VIBRATE, false)) {
+                nb.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE);
+            } else {
+                nb.setDefaults(Notification.DEFAULT_SOUND);
+            }
+        } else if (sharedPreferences.getBoolean(Constants.PREF_KEY_NOTIFICATIONS_VIBRATE, false)) {
+            nb.setDefaults(Notification.DEFAULT_VIBRATE);
+        }
+
 
         Notification notification = nb.getNotification();
         manager.notify(lastId, notification);
         notifications.put(lastId, notification);
         return lastId++;
-    }
-
-
-    public interface OnEventListener{
-        void onEvent();
     }
 
 }

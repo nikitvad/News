@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,7 +27,6 @@ import com.example.nikit.news.ui.adapter.NewsRvAdapter;
 import com.example.nikit.news.ui.dialog.FilterDialog;
 import com.example.nikit.news.util.NetworkUtil;
 import com.example.nikit.news.util.Prefs;
-import com.example.nikit.news.util.sdf;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -56,10 +54,7 @@ public class NewsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         sqLiteDbHelper = new SqLiteDbHelper(getContext());
-        //preferences = container.getContext().getSharedPreferences(
-        //        container.getContext().getPackageName(), container.getContext().MODE_PRIVATE);
         return inflater.inflate(R.layout.news_retrofit, container, false);
     }
 
@@ -94,7 +89,7 @@ public class NewsFragment extends Fragment {
         rvNews.addOnScrollListener(new HidingScrollListener(toolbar, tabLayout, btFilter));
 
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
-        swipeRefreshLayout.setProgressViewOffset(false, toolbar.getHeight()*2, 100);
+        swipeRefreshLayout.setProgressViewOffset(false, toolbar.getHeight() * 2, 100);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -102,8 +97,6 @@ public class NewsFragment extends Fragment {
                 swipeRefreshLayout.setRefreshing(true);
             }
         });
-
-
 
 
     }

@@ -1,24 +1,18 @@
 package com.example.nikit.news.util.firebase;
 
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.example.nikit.news.entities.News;
-import com.example.nikit.news.entities.facebook.User;
 import com.example.nikit.news.entities.firebase.SharedNews;
-import com.example.nikit.news.util.facebook.LoadUserInfo;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 
 import java.util.Date;
-
-import com.example.nikit.news.util.firebase.FirebaseConstants;
 
 import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_LIKES;
 import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_LIKES_COUNT;

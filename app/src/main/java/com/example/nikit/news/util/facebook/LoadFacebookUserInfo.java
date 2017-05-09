@@ -3,7 +3,7 @@ package com.example.nikit.news.util.facebook;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.example.nikit.news.entities.facebook.User;
+import com.example.nikit.news.entities.facebook.FacebookUser;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
@@ -17,27 +17,27 @@ import org.json.JSONObject;
  * Created by nikit on 15.04.2017.
  */
 
-public class LoadUserInfo {
+public class LoadFacebookUserInfo {
     private OnCompleteListener mListener;
 
-    public LoadUserInfo(OnCompleteListener mListener) {
+    public LoadFacebookUserInfo(OnCompleteListener mListener) {
         this.mListener = mListener;
     }
 
-    public static User getUserFromResponse(JSONObject object) {
+    public static FacebookUser getUserFromResponse(JSONObject object) {
         Gson gson = new Gson();
         if(object==null) return null;
-            User user = gson.fromJson(object.toString(), User.class);
+            FacebookUser facebookUser = gson.fromJson(object.toString(), FacebookUser.class);
             String urlToAvatar = "";
             try {
                 urlToAvatar = object.getJSONObject("picture").getJSONObject("data").getString("url");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            user.setUrlToAvatar(urlToAvatar);
-            Log.d("LoadUserInfo", user.toString());
+            facebookUser.setUrlToAvatar(urlToAvatar);
+            Log.d("LoadFacebookUserInfo", facebookUser.toString());
 
-            return user;
+            return facebookUser;
 
     }
 
@@ -49,7 +49,7 @@ public class LoadUserInfo {
                 new GraphRequest.GraphJSONObjectCallback() {
                     @Override
                     public void onCompleted(JSONObject object, GraphResponse response) {
-                        Log.d("LoadUserInfo", response.toString());
+                        Log.d("LoadFacebookUserInfo", response.toString());
                         if (mListener != null) {
                             mListener.onComplete(getUserFromResponse(object));
                         }
@@ -81,6 +81,6 @@ public class LoadUserInfo {
     }
 
     public interface OnCompleteListener {
-        void onComplete(User user);
+        void onComplete(FacebookUser facebookUser);
     }
 }

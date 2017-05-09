@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * Created by nikit on 16.04.2017.
  */
 
-public class NewsOfFriend {
+public class NewsFromFriend {
     private String openUid;
     private ArrayList<News.Article> articles;
 

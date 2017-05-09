@@ -1,13 +1,13 @@
 package com.example.nikit.news.ui.adapter.viewHolder;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -15,13 +15,14 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.example.nikit.news.Constants;
 import com.example.nikit.news.R;
 import com.example.nikit.news.database.DatabaseManager;
 import com.example.nikit.news.database.SqLiteDbHelper;
 import com.example.nikit.news.entities.News;
-import com.example.nikit.news.ui.activity.ShareByApp;
+import com.example.nikit.news.ui.activity.ShareByAppActivity;
 import com.example.nikit.news.ui.activity.WebViewActivity;
-import com.example.nikit.news.ui.fragment.CommentToNews;
+import com.example.nikit.news.ui.fragment.CommentToNewsFragment;
 import com.example.nikit.news.util.Prefs;
 import com.example.nikit.news.util.firebase.FirebaseNewsManager;
 import com.facebook.share.model.ShareLinkContent;
@@ -30,7 +31,6 @@ import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.plus.PlusShare;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 /**
@@ -60,6 +60,10 @@ public class ArticleViewHolder extends RecyclerView.ViewHolder
     private RecyclerView.Adapter adapter;
     private Fragment fragment;
 
+    public static void setImageWidth(int imageWidth) {
+        ArticleViewHolder.imageWidth = imageWidth;
+    }
+
     public ArticleViewHolder(View itemView, RecyclerView.Adapter adapter, Fragment fragment) {
         super(itemView);
 
@@ -86,7 +90,8 @@ public class ArticleViewHolder extends RecyclerView.ViewHolder
         tvLikesCount = (TextView) itemView.findViewById(R.id.tv_likes_count);
 
         if (imageWidth == 0) {
-            imageWidth = Prefs.getDisplayWidth();
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(itemView.getContext());
+            imageWidth = Integer.parseInt(sharedPreferences.getString(Constants.PREF_KEY_IMAGE_SIZE, "100"));
             imageHeight = (int) (imageWidth / 1.77);
         }
 
@@ -105,9 +110,15 @@ public class ArticleViewHolder extends RecyclerView.ViewHolder
             }
         });
 
-        Glide.with(itemView.getContext()).load(article.getUrlToImage()).dontAnimate()
-                .skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.RESULT)
-                .override(imageWidth, imageHeight).centerCrop().into(ivArticleImage);
+        if (imageWidth > 1) {
+            Glide.with(itemView.getContext()).load(article.getUrlToImage()).dontAnimate()
+                    .skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.RESULT)
+                    .override(imageWidth, imageHeight).centerCrop().into(ivArticleImage);
+        } else {
+            Glide.with(itemView.getContext()).load(article.getUrlToImage()).dontAnimate()
+                    .skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.RESULT)
+                    .centerCrop().into(ivArticleImage);
+        }
 
         if (!article.isLiked()) {
             ivLike.setImageResource(R.drawable.ic_favorite_border_black_24dp);
@@ -139,11 +150,11 @@ public class ArticleViewHolder extends RecyclerView.ViewHolder
                 if (Prefs.getLoggedType() == Prefs.FACEBOOK_LOGIN) {
                     FirebaseNewsManager.pushNews(article);
                     Bundle args = new Bundle();
-                    args.putString(CommentToNews.ARG_NEWS_ID, article.getArticleId());
-                    args.putString(CommentToNews.ARG_NEWS_TITLE, article.getTitle());
-                    args.putString(CommentToNews.ARG_NEWS_IMAGE, article.getUrlToImage());
-                    args.putString(CommentToNews.ARG_NEWS_DESC, article.getDescription());
-                    Intent intent = new Intent(itemView.getContext(), ShareByApp.class);
+                    args.putString(CommentToNewsFragment.ARG_NEWS_ID, article.getArticleId());
+                    args.putString(CommentToNewsFragment.ARG_NEWS_TITLE, article.getTitle());
+                    args.putString(CommentToNewsFragment.ARG_NEWS_IMAGE, article.getUrlToImage());
+                    args.putString(CommentToNewsFragment.ARG_NEWS_DESC, article.getDescription());
+                    Intent intent = new Intent(itemView.getContext(), ShareByAppActivity.class);
                     intent.putExtra("ARGS", args);
                     itemView.getContext().startActivity(intent);
                     floatingActionMenu.close(false);

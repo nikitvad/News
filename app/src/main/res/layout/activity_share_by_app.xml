@@ -4,7 +4,7 @@
     android:id="@+id/activity_share_by_app"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.nikit.news.ui.activity.ShareByApp">
+    tools:context="com.example.nikit.news.ui.activity.ShareByAppActivity">
 
     <include
         android:id="@+id/action_bar"

@@ -1,7 +1,6 @@
 package com.example.nikit.news.ui.fragment;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,10 +14,11 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.nikit.news.R;
-import com.example.nikit.news.entities.facebook.User;
-import com.example.nikit.news.util.facebook.LoadUserInfo;
+import com.example.nikit.news.entities.facebook.FacebookUser;
+import com.example.nikit.news.util.Util;
+import com.example.nikit.news.util.facebook.LoadFacebookUserInfo;
 
-public class CommentToNews extends Fragment {
+public class CommentToNewsFragment extends Fragment {
     public static final String ARG_NEWS_ID = "news_id";
     public static final String ARG_NEWS_TITLE = "news_title";
     public static final String ARG_NEWS_IMAGE = "news_image";
@@ -40,12 +40,12 @@ public class CommentToNews extends Fragment {
 
     private OnCommentFragmentInteractionListener mListener;
 
-    public CommentToNews() {
+    public CommentToNewsFragment() {
         // Required empty public constructor
     }
 
-    public static CommentToNews newInstance(String newsId, String newsTitle, String newsDesc, String newsImage) {
-        CommentToNews fragment = new CommentToNews();
+    public static CommentToNewsFragment newInstance(String newsId, String newsTitle, String newsDesc, String newsImage) {
+        CommentToNewsFragment fragment = new CommentToNewsFragment();
         Bundle args = new Bundle();
         args.putString(ARG_NEWS_ID, newsId);
         args.putString(ARG_NEWS_TITLE, newsTitle);
@@ -54,8 +54,8 @@ public class CommentToNews extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-    public static CommentToNews newInstance(Bundle args) {
-        CommentToNews fragment = new CommentToNews();
+    public static CommentToNewsFragment newInstance(Bundle args) {
+        CommentToNewsFragment fragment = new CommentToNewsFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -106,11 +106,11 @@ public class CommentToNews extends Fragment {
         Glide.with(getContext()).load(newsImage).into(ivNewsImage);
         tvNewsDesc.setText(newsDesc);
 
-        new LoadUserInfo(new LoadUserInfo.OnCompleteListener() {
+        new LoadFacebookUserInfo(new LoadFacebookUserInfo.OnCompleteListener() {
             @Override
-            public void onComplete(User user) {
-                Glide.with(getContext()).load(user.getUrlToAvatar()).into(ivUserAvatar);
-                tvUserName.setText(user.getName());
+            public void onComplete(FacebookUser facebookUser) {
+                Util.loadCircleImage(ivUserAvatar, facebookUser.getUrlToAvatar());
+                tvUserName.setText(facebookUser.getName());
             }
         }).load();
 

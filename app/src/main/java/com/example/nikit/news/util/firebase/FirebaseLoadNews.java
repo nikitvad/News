@@ -13,11 +13,7 @@ import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_LIKED_NEWS;
@@ -98,7 +94,7 @@ public class FirebaseLoadNews {
 
     }
 
-    public static void loadFavorites(final OnFavoriteNewsProgressListener listener) {
+    public static void loadFavorites(final OnFavoriteNewsLoadingStateListener listener) {
         DatabaseReference reference = database.getReference("users/" + firebaseAuth.getCurrentUser().getUid());
 
         reference.child(FB_REF_LIKED_NEWS).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -111,12 +107,10 @@ public class FirebaseLoadNews {
                     HashMap<String, Long> hashMap = dataSnapshot.getValue(t);
                     Log.d("loadFavorites", hashMap.toString());
 
-                    Iterator<Map.Entry<String, Long>> iterator = hashMap.entrySet().iterator();
 
                     new FirebaseLoadNews().load(hashMap.keySet(), new FirebaseLoadNews.OnProgressListener() {
                         @Override
                         public void onProgress(News.Article article) {
-                            //article.setLiked(true);
                             if (listener != null) {
                                 listener.onProgress(article);
                                 Log.d("loadFavorites", article.toString());
@@ -124,19 +118,20 @@ public class FirebaseLoadNews {
                         }
                     });
                 }
-
+                listener.onFinish();
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                listener.onFinish();
             }
         });
 
     }
 
-    public interface OnFavoriteNewsProgressListener {
+    public interface OnFavoriteNewsLoadingStateListener {
         void onProgress(News.Article article);
+        void onFinish();
 
     }
 

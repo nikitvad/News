@@ -98,6 +98,7 @@ public class NewsRvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     public void clearData() {
         articles.clear();
+        ArticleViewHolder.setImageWidth(0);
         notifyDataSetChanged();
     }
 

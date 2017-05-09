@@ -1,27 +1,22 @@
 package com.example.nikit.news.ui.fragment;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.nikit.news.R;
 import com.example.nikit.news.entities.firebase.SharedNews;
-import com.example.nikit.news.entities.ui.ListItem;
 import com.example.nikit.news.ui.adapter.NewsesFromFriendsRvAdapter;
 import com.example.nikit.news.util.firebase.LoadNewsesFromFriends;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import java.util.ArrayList;
 
 public class NewsFromFriendsFragment extends Fragment {
 
@@ -29,7 +24,6 @@ public class NewsFromFriendsFragment extends Fragment {
     private RecyclerView recyclerView;
     private NewsesFromFriendsRvAdapter adapter;
     private SwipeRefreshLayout swipeRefreshLayout;
-
 
     public NewsFromFriendsFragment() {
         // Required empty public constructor
@@ -83,11 +77,15 @@ public class NewsFromFriendsFragment extends Fragment {
         swipeRefreshLayout.setRefreshing(true);
         adapter.clearData();
         LoadNewsesFromFriends loadNewsesFromFriends = new LoadNewsesFromFriends();
-        loadNewsesFromFriends.loadAll(new LoadNewsesFromFriends.OnSharedNewsProgressListener() {
+        loadNewsesFromFriends.loadAll(new LoadNewsesFromFriends.OnLoadingStateListener() {
             @Override
             public void onProgress(SharedNews sharedNews) {
-                swipeRefreshLayout.setRefreshing(false);
                 adapter.addShareNews(sharedNews);
+            }
+
+            @Override
+            public void onFinish() {
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
 

@@ -1,7 +1,5 @@
 package com.example.nikit.news.ui.fragment;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,12 +9,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.nikit.news.R;
 import com.example.nikit.news.entities.News;
 import com.example.nikit.news.ui.adapter.NewsRvAdapter;
 import com.example.nikit.news.util.firebase.FirebaseLoadNews;
-import com.example.nikit.news.util.firebase.LoadNewsesFromFriends;
 
 
 public class FavoritesFragment extends Fragment {
@@ -73,10 +71,14 @@ public class FavoritesFragment extends Fragment {
     private void updateContent() {
         adapter.clearData();
         swipeRefreshLayout.setRefreshing(true);
-        new FirebaseLoadNews().loadFavorites(new FirebaseLoadNews.OnFavoriteNewsProgressListener() {
+        new FirebaseLoadNews().loadFavorites(new FirebaseLoadNews.OnFavoriteNewsLoadingStateListener() {
             @Override
             public void onProgress(News.Article article) {
                 adapter.addArticle(article);
+            }
+
+            @Override
+            public void onFinish() {
                 swipeRefreshLayout.setRefreshing(false);
             }
         });

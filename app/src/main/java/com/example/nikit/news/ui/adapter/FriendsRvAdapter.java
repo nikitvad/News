@@ -7,11 +7,10 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.example.nikit.news.R;
-import com.example.nikit.news.entities.facebook.User;
+import com.example.nikit.news.entities.facebook.FacebookUser;
+import com.example.nikit.news.util.Util;
 
 import java.util.ArrayList;
 
@@ -20,11 +19,11 @@ import java.util.ArrayList;
  */
 
 public class FriendsRvAdapter extends RecyclerView.Adapter<FriendsRvAdapter.FriendViewHolder> {
-    private ArrayList<User> users;
+    private ArrayList<FacebookUser> facebookUsers;
     private OnClickListener mListener;
 
     public FriendsRvAdapter() {
-        users = new ArrayList<>();
+        facebookUsers = new ArrayList<>();
     }
 
     public void setOnClickListener(OnClickListener listener) {
@@ -40,31 +39,31 @@ public class FriendsRvAdapter extends RecyclerView.Adapter<FriendsRvAdapter.Frie
 
     @Override
     public void onBindViewHolder(FriendViewHolder holder, int position) {
-        holder.bindFriend(users.get(position));
+        holder.bindFriend(facebookUsers.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return users.size();
+        return facebookUsers.size();
     }
 
-    public void swapData(ArrayList<User> newUserList) {
-        if (newUserList != null) {
-            users.clear();
-            users.addAll(newUserList);
+    public void swapData(ArrayList<FacebookUser> newFacebookUserList) {
+        if (newFacebookUserList != null) {
+            facebookUsers.clear();
+            facebookUsers.addAll(newFacebookUserList);
             notifyDataSetChanged();
         }
     }
 
-    public void addFriend(User user) {
-        if (user != null) {
-            users.add(user);
+    public void addFriend(FacebookUser facebookUser) {
+        if (facebookUser != null) {
+            facebookUsers.add(facebookUser);
             notifyDataSetChanged();
         }
     }
 
     public interface OnClickListener {
-        void onClick(View v, User user);
+        void onClick(View v, FacebookUser facebookUser);
     }
 
 
@@ -83,9 +82,9 @@ public class FriendsRvAdapter extends RecyclerView.Adapter<FriendsRvAdapter.Frie
             itemView.setOnClickListener(this);
         }
 
-        public void bindFriend(User user) {
-            Glide.with(itemView.getContext()).load(user.getUrlToAvatar()).into(ivAvatar);
-            tvName.setText(user.getName());
+        public void bindFriend(FacebookUser facebookUser) {
+            Util.loadCircleImage(ivAvatar, facebookUser.getUrlToAvatar());
+            tvName.setText(facebookUser.getName());
 
         }
 
@@ -94,10 +93,10 @@ public class FriendsRvAdapter extends RecyclerView.Adapter<FriendsRvAdapter.Frie
             if (mListener != null) {
                 if (!cbSelected.isChecked()) {
                     cbSelected.setChecked(true);
-                    mListener.onClick(view, users.get(getAdapterPosition()));
+                    mListener.onClick(view, facebookUsers.get(getAdapterPosition()));
                 } else {
                     cbSelected.setChecked(false);
-                    mListener.onClick(view, users.get(getAdapterPosition()));
+                    mListener.onClick(view, facebookUsers.get(getAdapterPosition()));
 
                 }
             }

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.example.nikit.news.ui.fragment.CommentToNews">
+    tools:context="com.example.nikit.news.ui.fragment.CommentToNewsFragment">
 
 
     <RelativeLayout
@@ -39,8 +39,8 @@
             <EditText
                 android:id="@+id/et_news_comment"
                 android:layout_width="match_parent"
-                android:gravity="start"
                 android:layout_height="75dp"
+                android:gravity="start"
                 android:hint="comment" />
 
             <TextView
@@ -67,7 +67,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:text="submit" />
+            android:background="@drawable/rounded_button"
+            android:text="submit"
+            android:textColor="#fff" />
     </RelativeLayout>
 
 

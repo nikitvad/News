@@ -2,20 +2,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.nikit.news.ui.fragment.AvailableFriends">
+    tools:context="com.example.nikit.news.ui.fragment.AvailableFriendsFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_friends"
-        android:layout_above="@+id/bt_asdfasdfasdf"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bt_share_next" />
 
     <Button
-        android:text="next"
-        android:id="@+id/bt_asdfasdfasdf"
-        android:layout_alignParentBottom="true"
+        android:id="@+id/bt_share_next"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/rounded_button"
+        android:text="next"
+        android:textColor="#fff" />
 
 </RelativeLayout>

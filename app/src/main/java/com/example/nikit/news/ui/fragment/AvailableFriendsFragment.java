@@ -15,13 +15,13 @@ import android.widget.CheckBox;
 import android.widget.Toast;
 
 import com.example.nikit.news.R;
-import com.example.nikit.news.entities.facebook.User;
+import com.example.nikit.news.entities.facebook.FacebookUser;
 import com.example.nikit.news.ui.adapter.FriendsRvAdapter;
-import com.example.nikit.news.util.facebook.LoadUserFriends;
+import com.example.nikit.news.util.facebook.LoadFacebookFriends;
 
 import java.util.HashSet;
 
-public class AvailableFriends extends Fragment {
+public class AvailableFriendsFragment extends Fragment {
 
 
     private HashSet<String> selectedFriendUids;
@@ -31,13 +31,13 @@ public class AvailableFriends extends Fragment {
     private FriendsRvAdapter friendsRvAdapter;
     private OnFragmentInteractionListener fragmentInteractionListener;
 
-    public AvailableFriends() {
+    public AvailableFriendsFragment() {
         selectedFriendUids = new HashSet<>();
     }
 
     // TODO: Rename and change types and number of parameters
-    public static AvailableFriends newInstance() {
-        AvailableFriends fragment = new AvailableFriends();
+    public static AvailableFriendsFragment newInstance() {
+        AvailableFriendsFragment fragment = new AvailableFriendsFragment();
         return fragment;
     }
 
@@ -74,7 +74,7 @@ public class AvailableFriends extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        btNext = (Button) view.findViewById(R.id.bt_asdfasdfasdf);
+        btNext = (Button) view.findViewById(R.id.bt_share_next);
         btNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -92,12 +92,12 @@ public class AvailableFriends extends Fragment {
         friendsRvAdapter = new FriendsRvAdapter();
         friendsRvAdapter.setOnClickListener(new FriendsRvAdapter.OnClickListener() {
             @Override
-            public void onClick(View v, User user) {
+            public void onClick(View v, FacebookUser facebookUser) {
                 CheckBox cb = (CheckBox) v.findViewById(R.id.cb_friend_selected);
                 if (cb.isChecked()) {
-                    selectedFriendUids.add(user.getId());
+                    selectedFriendUids.add(facebookUser.getId());
                 } else {
-                    selectedFriendUids.remove(user.getId());
+                    selectedFriendUids.remove(facebookUser.getId());
                 }
             }
         });
@@ -106,10 +106,10 @@ public class AvailableFriends extends Fragment {
         rvFriends.setAdapter(friendsRvAdapter);
         rvFriends.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        new LoadUserFriends(new LoadUserFriends.OnProgressListener() {
+        new LoadFacebookFriends(new LoadFacebookFriends.OnProgressListener() {
             @Override
-            public void onProgress(User user) {
-                friendsRvAdapter.addFriend(user);
+            public void onProgress(FacebookUser facebookUser) {
+                friendsRvAdapter.addFriend(facebookUser);
             }
         }).load();
 

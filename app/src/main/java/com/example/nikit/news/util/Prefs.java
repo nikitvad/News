@@ -20,6 +20,7 @@ public class Prefs {
     public static final int NOT_LOGIN = 0;
     public static final int GOOGLE_LOGIN = 1;
     public static final int FACEBOOK_LOGIN = 2;
+    public static final int EMAIL_LOGIN = 3;
 
     private static SharedPreferences sPrefs;
 

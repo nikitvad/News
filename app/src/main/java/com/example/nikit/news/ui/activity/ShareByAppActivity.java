@@ -1,45 +1,49 @@
 package com.example.nikit.news.ui.activity;
 
-import android.net.Uri;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
 import com.example.nikit.news.R;
 import com.example.nikit.news.entities.firebase.SharedNews;
-import com.example.nikit.news.ui.fragment.AvailableFriends;
-import com.example.nikit.news.ui.fragment.CommentToNews;
+import com.example.nikit.news.ui.fragment.AvailableFriendsFragment;
+import com.example.nikit.news.ui.fragment.CommentToNewsFragment;
 import com.example.nikit.news.util.firebase.FirebaseNewsManager;
 import com.facebook.AccessToken;
 
 import java.util.HashSet;
 
-public class ShareByApp extends AppCompatActivity
-        implements AvailableFriends.OnFragmentInteractionListener,
-        CommentToNews.OnCommentFragmentInteractionListener {
+public class ShareByAppActivity extends AppCompatActivity
+        implements AvailableFriendsFragment.OnFragmentInteractionListener,
+        CommentToNewsFragment.OnCommentFragmentInteractionListener {
 
     private String newsId;
+    private Toolbar toolbar;
 
     private HashSet<String> selectedFriends;
-    private CommentToNews commentToNews;
-    private AvailableFriends availableFriends;
+    private CommentToNewsFragment commentToNews;
+    private AvailableFriendsFragment availableFriends;
 
-    private FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_share_by_app);
 
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         Bundle bundle = getIntent().getBundleExtra("ARGS");
         if (bundle != null) {
-            newsId = bundle.getString(CommentToNews.ARG_NEWS_ID, "");
+            newsId = bundle.getString(CommentToNewsFragment.ARG_NEWS_ID, "");
 
-            commentToNews = CommentToNews.newInstance(getIntent().getBundleExtra("ARGS"));
-            availableFriends = AvailableFriends.newInstance();
-            fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.share_container, availableFriends).commit();
+            commentToNews = CommentToNewsFragment.newInstance(getIntent().getBundleExtra("ARGS"));
+            availableFriends = AvailableFriendsFragment.newInstance();
+            getSupportFragmentManager().beginTransaction().add(R.id.share_container, availableFriends).commit();
 
         } else {
             Toast.makeText(getApplicationContext(), "error", Toast.LENGTH_SHORT).show();
@@ -49,7 +53,8 @@ public class ShareByApp extends AppCompatActivity
 
     @Override
     public void onFragmentInteraction(HashSet<String> uid) {
-        fragmentManager.beginTransaction().replace(R.id.share_container, commentToNews).commit();
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.share_container, commentToNews).commit();
         selectedFriends = uid;
     }
 

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:key="pref_key_network_settings"
+        android:title="network">
+        <ListPreference
+            android:defaultValue="768"
+            android:entries="@array/pref_image_size_titles"
+            android:entryValues="@array/pref_image_size_values"
+            android:key="pref_key_image_size"
+            android:title="@string/pref_title_image_size" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="pref_key_enable_javascript"
+            android:summary="Some web pages may require JavaScript"
+            android:title="Enable JavaScript" />
+    </PreferenceCategory>
+
+
+    <PreferenceCategory
+        android:key="pref_key_notifications_settings"
+        android:title="notifications">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="pref_key_notifications_receive"
+            android:title="receive notifications" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="pref_key_notification_vibrate"
+            android:title="Vibrate" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="pref_key_notification_sound"
+            android:title="Sound" />
+    </PreferenceCategory>
+</PreferenceScreen>

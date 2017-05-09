@@ -2,6 +2,7 @@ package com.example.nikit.news.services;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.util.Log;
 
 import com.example.nikit.news.R;
 import com.example.nikit.news.util.NotificationUtils;
@@ -19,16 +20,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class NewsFromFriendsService extends IntentService {
 
-    /**
-     * The IntentService calls this method from the default worker thread with
-     * the intent that started the service. When this method returns, IntentService
-     * stops the service, as appropriate.
-     */
-
-    /**
-     * A constructor is required, and must call the super IntentService(String)
-     * constructor with a name for the worker thread.
-     */
+    public boolean isDestroyed = false;
 
     public NewsFromFriendsService() {
         super(NewsFromFriendsService.class.getSimpleName());
@@ -37,14 +29,16 @@ public class NewsFromFriendsService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        while (true) {
+        while (!isDestroyed) {
             synchronized (this) {
                 try {
                     wait(10000);
+                    Log.d("NewsFromFriendsService", "service is running...");
                     FirebaseNewsManager.getCountNewSharedNewses(new FirebaseNewsManager.OnResultListener() {
                         @Override
                         public void onResult(long count) {
                             if (count > 0) {
+
                                 NotificationUtils.getInstance(getApplicationContext()).createInfoNotification(
                                         getResources().getString(R.string.notification_there_newses_fom_friends));
                             }
@@ -54,8 +48,12 @@ public class NewsFromFriendsService extends IntentService {
                 }
             }
         }
-
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        isDestroyed = true;
 
+    }
 }

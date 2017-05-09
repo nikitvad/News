@@ -1,6 +1,6 @@
 package com.example.nikit.news.util.facebook;
 
-import com.example.nikit.news.entities.facebook.User;
+import com.example.nikit.news.entities.facebook.FacebookUser;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -16,23 +16,23 @@ import java.util.ArrayList;
  */
 
 public class FacebookUtil {
-    private static ArrayList<User> tempUserList;
+    private static ArrayList<FacebookUser> tempFacebookUserList;
 
-    public static ArrayList<User> getFacebookFriendsFromJson(JSONObject jsonObject) {
-        Type ArrayListFriendType = new TypeToken<ArrayList<User>>() {
+    public static ArrayList<FacebookUser> getFacebookFriendsFromJson(JSONObject jsonObject) {
+        Type ArrayListFriendType = new TypeToken<ArrayList<FacebookUser>>() {
         }.getType();
         Gson gson = new Gson();
-        ArrayList<User> users = new ArrayList<>();
+        ArrayList<FacebookUser> facebookUsers = new ArrayList<>();
         try {
             JSONObject object = jsonObject.getJSONObject("friends");
             JSONArray jsonArray = object.getJSONArray("data");
 
-            users = gson.fromJson(jsonArray.toString(), ArrayListFriendType);
+            facebookUsers = gson.fromJson(jsonArray.toString(), ArrayListFriendType);
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return users;
+        return facebookUsers;
     }
 
 }

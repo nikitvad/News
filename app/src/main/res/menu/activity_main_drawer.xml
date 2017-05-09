@@ -2,27 +2,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/nav_main"
-        android:icon="@drawable/ic_menu_camera"
-        android:title="@string/draw_menu_main" />
-    <item
         android:id="@+id/nav_favorites"
-        android:icon="@drawable/ic_menu_gallery"
+        android:icon="@drawable/ic_favorite_black_24dp"
         android:title="@string/draw_menu_favorites" />
     <item
         android:id="@+id/nav_news_from_friends"
-        android:icon="@drawable/ic_menu_slideshow"
+        android:icon="@drawable/ic_folder_shared_black_24dp"
         android:title="@string/draw_menu_news_from_friends" />
-    <item
-        android:id="@+id/nav_sources"
-        android:icon="@drawable/ic_menu_manage"
-        android:title="@string/draw_menu_sources" />
+
     <item
         android:id="@+id/nav_settings"
+        android:icon="@drawable/ic_settings_applications_black_24dp"
         android:title="@string/draw_menu_settings" />
     <item
         android:id="@+id/nav_sign_out"
+        android:icon="@drawable/ic_input_black_24dp"
         android:title="@string/draw_menu_sign_out" />
-
-
 </menu>

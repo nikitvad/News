@@ -6,7 +6,7 @@ import java.util.HashMap;
  * Created by nikit on 15.04.2017.
  */
 
-public class User  {
+public class FacebookUser {
     private String id;
     private String name;
     private String urlToAvatar;
@@ -37,7 +37,7 @@ public class User  {
 
     @Override
     public String toString() {
-        return "User{" +
+        return "FacebookUser{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", urlToAvatar='" + urlToAvatar + '\'' +
