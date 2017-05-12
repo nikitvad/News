@@ -7,13 +7,12 @@
     tools:context="com.example.nikit.news.ui.activity.ShareByAppActivity">
 
     <include
-        android:id="@+id/action_bar"
         layout="@layout/tool_bar" />
 
     <FrameLayout
         android:id="@+id/share_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/action_bar" />
+        android:layout_below="@+id/toolbar" />
 
 </RelativeLayout>

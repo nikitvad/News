@@ -8,4 +8,14 @@
 
     <dimen name="news_image_height">200dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+
+    <!--login activity -->
+    <dimen name="login_et_height">60dp</dimen>
+    <dimen name="login_bt_sign_in_by_email_height">55dp</dimen>
+
+    <!-- registration activity-->
+    <dimen name="registration_et_height">60dp</dimen>
+    <dimen name="registration_bt_height">55dp</dimen>
+
+
 </resources>

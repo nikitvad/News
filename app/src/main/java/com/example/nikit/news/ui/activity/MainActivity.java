@@ -43,9 +43,6 @@ import com.google.firebase.auth.FirebaseUser;
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, FilterDialog.NoticeDialogListener {
 
-    public static final String FRAGMENT_TYPE_KEY = "fragment_type";
-    public static final String SHARED_NEWS_FRAGMENT_TYPE = "shared_news_fragment";
-
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private Toolbar toolbar;
@@ -59,12 +56,10 @@ public class MainActivity extends BaseActivity
     private FirebaseAuth firebaseAuth;
     private GoogleApiClient googleApiClient;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
@@ -73,6 +68,7 @@ public class MainActivity extends BaseActivity
 
         viewPager = (ViewPager) findViewById(R.id.pager);
         setupViewPager(viewPager);
+
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
 
@@ -87,7 +83,6 @@ public class MainActivity extends BaseActivity
                 .build();
 
         firebaseAuth = FirebaseAuth.getInstance();
-
         firebaseAuth.addAuthStateListener(new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -118,15 +113,18 @@ public class MainActivity extends BaseActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         FirebaseUserManager.getCurrentUserInfo(new FirebaseUserManager.OnCompleteListener() {
             @Override
             public void onComplete(AppUser user) {
                 updateNavDrawerHeader(user);
             }
         });
-
-
-
     }
 
     @Override
@@ -138,7 +136,6 @@ public class MainActivity extends BaseActivity
             super.onBackPressed();
         }
     }
-
 
     private void setupViewPager(ViewPager viewPager) {
         PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager());
@@ -191,6 +188,7 @@ public class MainActivity extends BaseActivity
     }
 
     private void updateNavDrawerHeader(AppUser user) {
+
         if (navHeader == null) {
             navHeader = navigationView.inflateHeaderView(R.layout.nav_header_main);
         } else {
@@ -210,6 +208,8 @@ public class MainActivity extends BaseActivity
         }
         if (user.getUrlToPhoto() != null) {
             Util.loadCircleImage(imageView, user.getUrlToPhoto().toString());
+        }else{
+            imageView.setImageResource(R.drawable.app_icon);
         }
 
     }
@@ -221,15 +221,14 @@ public class MainActivity extends BaseActivity
         if (Prefs.getLoggedType() == Prefs.GOOGLE_LOGIN) {
             if (googleApiClient.isConnected()) {
                 Auth.GoogleSignInApi.signOut(googleApiClient);
-
             }
 
         } else if (Prefs.getLoggedType() == Prefs.FACEBOOK_LOGIN) {
             LoginManager.getInstance().logOut();
             firebaseAuth.signOut();
-            Prefs.setLoggedType(Prefs.NOT_LOGIN);
         }
         firebaseAuth.signOut();
+        Prefs.setLoggedType(Prefs.NOT_LOGIN);
         startActivity(intent);
     }
 

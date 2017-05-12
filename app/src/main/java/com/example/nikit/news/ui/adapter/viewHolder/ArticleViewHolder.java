@@ -39,6 +39,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class ArticleViewHolder extends RecyclerView.ViewHolder
         implements View.OnClickListener {
+
     private static int imageHeight = 0;
     private static int imageWidth = 0;
     private News.Article article;
@@ -60,10 +61,6 @@ public class ArticleViewHolder extends RecyclerView.ViewHolder
     private RecyclerView.Adapter adapter;
     private Fragment fragment;
 
-    public static void setImageWidth(int imageWidth) {
-        ArticleViewHolder.imageWidth = imageWidth;
-    }
-
     public ArticleViewHolder(View itemView, RecyclerView.Adapter adapter, Fragment fragment) {
         super(itemView);
 
@@ -76,7 +73,6 @@ public class ArticleViewHolder extends RecyclerView.ViewHolder
         sqLiteDbHelper = new SqLiteDbHelper(itemView.getContext());
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseDatabase = FirebaseDatabase.getInstance();
-
 
         floatingActionMenu = (FloatingActionMenu) itemView.findViewById(R.id.fam_share_menu);
         fabShareByApp = (FloatingActionButton) itemView.findViewById(R.id.menu_share_by_app);
@@ -97,11 +93,16 @@ public class ArticleViewHolder extends RecyclerView.ViewHolder
 
     }
 
+    public static void setImageWidth(int imageWidth) {
+        ArticleViewHolder.imageWidth = imageWidth;
+    }
+
     public void bindArticle(final News.Article article) {
         this.article = article;
 
         tvArticleTitle.setText(article.getTitle());
         tvArticleDesc.setText(article.getDescription());
+        tvLikesCount.setText("");
 
         FirebaseNewsManager.getLikesCount(article.getArticleId(), new FirebaseNewsManager.OnResultListener() {
             @Override
@@ -125,7 +126,6 @@ public class ArticleViewHolder extends RecyclerView.ViewHolder
         } else {
             ivLike.setImageResource(R.drawable.ic_favorite_black_24dp);
         }
-
 
         ivLike.setOnClickListener(this);
         fabShareByFacebook.setOnClickListener(this);
@@ -218,7 +218,6 @@ public class ArticleViewHolder extends RecyclerView.ViewHolder
 
                     }
                 });
-
 
             }
         }

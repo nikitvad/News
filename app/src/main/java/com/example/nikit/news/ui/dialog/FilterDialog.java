@@ -82,7 +82,6 @@ public class FilterDialog extends DialogFragment {
 
         listDataHeader = new ArrayList<String>();
         listDataHeader.add("resources");
-        //listDataHeader.add("categories");
 
         listDataChild = new HashMap<String, List<Source>>();
         listDataChild.put(listDataHeader.get(0), new ArrayList<Source>());
@@ -105,7 +104,6 @@ public class FilterDialog extends DialogFragment {
             db = DatabaseManager.getInstance().openDatabase();
             dbHelper = new SqLiteDbHelper(getContext());
             sources = new ArrayList<>();
-            //listDataChild
         }
 
         @Override

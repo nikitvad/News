@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 import com.example.nikit.news.R;
 import com.example.nikit.news.util.Prefs;
@@ -28,13 +29,8 @@ public class BaseActivity extends AppCompatActivity
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        //SharedPreferences sharedPreferences = getSharedPreferences(getApplicationContext().getPackageName(),
-        //        Context.MODE_PRIVATE);
 
-        if (Prefs.isFirstLaunch() || Prefs.getLoggedType() == Prefs.NOT_LOGIN) {
-            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
+        if (Prefs.isFirstLaunch()) {
 
             HashSet<String> strings = new HashSet<>();
             strings.add("bbc-news");
@@ -42,14 +38,13 @@ public class BaseActivity extends AppCompatActivity
             new UpdateAvailableSourcesAsync(getApplicationContext(), this).execute();
 
             PreferenceManager.setDefaultValues(this, R.xml.preference_fragment, false);
-
             Prefs.setFirstLaunch(false);
 
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-
-
-
-
+        }
+        if (Prefs.getLoggedType() == Prefs.NOT_LOGIN) {
+            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
         }
         if (Prefs.getSourcesCount() == 0) {
             new UpdateAvailableSourcesAsync(getApplicationContext(), this).execute();

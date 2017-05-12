@@ -18,7 +18,6 @@ public class SettingsFragment extends PreferenceFragment
 
 
     public static final String KEY_PREF_SYNC_FREQUENCY = "pref_key_sync_frequency";
-    private static int serviceId = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,7 +47,6 @@ public class SettingsFragment extends PreferenceFragment
                     getActivity().startService(intent);
                 } else {
                     getActivity().stopService(intent);
-                    Log.d("NewsFromFriendsService", "stopping service");
                 }
             }
         }

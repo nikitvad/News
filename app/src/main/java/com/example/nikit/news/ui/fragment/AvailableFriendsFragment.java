@@ -35,7 +35,6 @@ public class AvailableFriendsFragment extends Fragment {
         selectedFriendUids = new HashSet<>();
     }
 
-    // TODO: Rename and change types and number of parameters
     public static AvailableFriendsFragment newInstance() {
         AvailableFriendsFragment fragment = new AvailableFriendsFragment();
         return fragment;
@@ -66,7 +65,6 @@ public class AvailableFriendsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_available_friends, container, false);
     }
 
@@ -78,10 +76,10 @@ public class AvailableFriendsFragment extends Fragment {
         btNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(fragmentInteractionListener!=null){
-                    if(selectedFriendUids.size()>0) {
+                if (fragmentInteractionListener != null) {
+                    if (selectedFriendUids.size() > 0) {
                         fragmentInteractionListener.onFragmentInteraction(selectedFriendUids);
-                    }else{
+                    } else {
                         Toast.makeText(getContext(), "Need to select minimum one friend", Toast.LENGTH_SHORT).show();
                     }
                 }

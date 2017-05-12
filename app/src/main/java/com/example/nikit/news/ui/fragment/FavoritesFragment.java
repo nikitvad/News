@@ -9,11 +9,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.nikit.news.R;
 import com.example.nikit.news.entities.News;
 import com.example.nikit.news.ui.adapter.NewsRvAdapter;
+import com.example.nikit.news.util.NetworkUtil;
 import com.example.nikit.news.util.firebase.FirebaseLoadNews;
 
 
@@ -21,9 +23,9 @@ public class FavoritesFragment extends Fragment {
     private RecyclerView rvFavoriteNews;
     private NewsRvAdapter adapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private TextView tvNoFavorites;
 
     public FavoritesFragment() {
-        // Required empty public constructor
     }
 
 
@@ -45,6 +47,8 @@ public class FavoritesFragment extends Fragment {
         rvFavoriteNews.setAdapter(adapter);
         rvFavoriteNews.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        tvNoFavorites = (TextView) view.findViewById(R.id.tv_no_favorites);
+
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -64,24 +68,32 @@ public class FavoritesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_favorites, container, false);
     }
 
     private void updateContent() {
-        adapter.clearData();
-        swipeRefreshLayout.setRefreshing(true);
-        new FirebaseLoadNews().loadFavorites(new FirebaseLoadNews.OnFavoriteNewsLoadingStateListener() {
-            @Override
-            public void onProgress(News.Article article) {
-                adapter.addArticle(article);
-            }
+        if (NetworkUtil.isNetworkAvailable(getActivity())) {
+            adapter.clearData();
+            swipeRefreshLayout.setRefreshing(true);
+            tvNoFavorites.setVisibility(View.GONE);
+            new FirebaseLoadNews().loadFavorites(new FirebaseLoadNews.OnFavoriteNewsLoadingStateListener() {
+                @Override
+                public void onProgress(News.Article article) {
+                    adapter.addArticle(article);
+                }
 
-            @Override
-            public void onFinish() {
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        });
+                @Override
+                public void onFinish() {
+                    swipeRefreshLayout.setRefreshing(false);
+                    if (adapter.getArticles().size() < 1) {
+                        tvNoFavorites.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
+        } else {
+            tvNoFavorites.setVisibility(View.VISIBLE);
+            Toast.makeText(getContext(), R.string.toast_msg_connection_error, Toast.LENGTH_SHORT).show();
+        }
     }
 
 }

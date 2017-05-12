@@ -25,8 +25,7 @@ import com.example.nikit.news.util.Prefs;
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     private Context context;
-    private List<String> listDataHeader; // header titles
-    //private SharedPreferences sharedPreferences;
+    private List<String> listDataHeader;
     private Set<String> filterSourcesSet;
 
     // child data in format of header title, child title
@@ -39,11 +38,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         this.listDataChild = listChildData;
 
         filterSourcesSet = new HashSet<>();
-        //sharedPreferences = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
-        //filterSourcesSet.addAll(sharedPreferences.getStringSet(Constants.FILTER_SOURCES_TAG, new HashSet<String>()));
         filterSourcesSet.addAll(Prefs.getSourcesFilter());
-
-
     }
 
     @Override
@@ -145,13 +140,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     public void saveChanges() {
         Prefs.setSourcesFilter(filterSourcesSet);
-        //sharedPreferences.edit().remove(Constants.FILTER_SOURCES_TAG).commit();
-        //sharedPreferences.edit().putStringSet(Constants.FILTER_SOURCES_TAG, filterSourcesSet).commit();
     }
 
     public void resetChanges() {
-        //filterSourcesSet = sharedPreferences.getStringSet(Constants.FILTER_SOURCES_TAG, new HashSet<String>());
         filterSourcesSet = Prefs.getSourcesFilter();
-
     }
 }

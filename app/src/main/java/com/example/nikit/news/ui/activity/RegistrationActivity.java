@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.nikit.news.R;
@@ -27,7 +28,6 @@ import java.util.regex.Pattern;
 
 public class RegistrationActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private Toolbar toolbar;
     private FirebaseAuth mAuth;
 
     private EditText etFullName;
@@ -35,6 +35,7 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
     private EditText etPassword;
     private EditText etRepeatPassword;
     private Button btSubmit;
+    private TextView tvAlreadyHaveAnAccount;
 
     private ProgressDialog mProgressDialog;
 
@@ -43,19 +44,17 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
         etFullName = (EditText) findViewById((R.id.et_registration_name));
         etEmail = (EditText) findViewById((R.id._et_registration_email));
         etPassword = (EditText) findViewById((R.id.et_registration_password));
         etRepeatPassword = (EditText) findViewById((R.id.et_registration_password_repeat));
         btSubmit = (Button) findViewById((R.id.bt_registration_submit));
+        tvAlreadyHaveAnAccount = (TextView) findViewById(R.id.tv_already_have_an_account);
+
+        tvAlreadyHaveAnAccount.setOnClickListener(this);
         btSubmit.setOnClickListener(this);
 
         mAuth = FirebaseAuth.getInstance();
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void createAccount(String email, String password) {
@@ -81,6 +80,7 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
                             FirebaseUserManager.synchronizeUserData(getApplicationContext());
                             Prefs.setLoggedType(Prefs.EMAIL_LOGIN);
 
+
                             Intent intent = new Intent(RegistrationActivity.this, MainActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
@@ -103,7 +103,7 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
         }
 
         String password = etPassword.getText().toString();
-        String passwordRepeat = etPassword.getText().toString();
+        String passwordRepeat = etRepeatPassword.getText().toString();
         if (TextUtils.isEmpty(password)) {
             etPassword.setError("Required.");
             valid = false;
@@ -111,7 +111,7 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
             etPassword.setError(null);
         }
         if (!password.equals(passwordRepeat)) {
-            etRepeatPassword.setError("passwords not match");
+            etRepeatPassword.setError("passwords not matching");
             valid = false;
         }
 
@@ -144,6 +144,10 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
         switch (view.getId()) {
             case R.id.bt_registration_submit:
                 createAccount(etEmail.getText().toString(), etPassword.getText().toString());
+                break;
+            case R.id.tv_already_have_an_account:
+                finish();
+                break;
         }
     }
 }

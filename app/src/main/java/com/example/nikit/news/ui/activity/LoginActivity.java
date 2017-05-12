@@ -56,7 +56,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private CallbackManager callbackManager;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener firebaseAuthStateListener;
-    private FirebaseDatabase firebaseDatabase;
     private GoogleApiClient googleApiClient;
 
     @Override
@@ -66,12 +65,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         etAuthEmail = (EditText) findViewById(R.id.et_auth_email);
         etAuthPassword = (EditText) findViewById(R.id.et_auth_pass);
-        tvCreateAccount = (TextView)findViewById(R.id.tv_create_account);
+        tvCreateAccount = (TextView) findViewById(R.id.tv_create_account);
 
         tvCreateAccount.setOnClickListener(this);
 
         //Firebase initializing
-        firebaseDatabase = FirebaseDatabase.getInstance();
         mAuth = FirebaseAuth.getInstance();
         firebaseAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -115,33 +113,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         //login buttons
         btLoginByFacebook = (Button) findViewById(R.id.login_by_facebook);
-        btLoginByFacebook.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this,
-                        Arrays.asList("public_profile", "user_friends", "read_custom_friendlists", "email"));
-
-            }
-        });
-        btLoginByGoogle = (Button) findViewById(R.id.bt_login_by_google);
-        btLoginByGoogle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                signInByGoogle();
-            }
-        });
-
-
         btLoginByEmail = (Button) findViewById(R.id.bt_login_by_email);
-        /*btLoginByEmail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(LoginActivity.this, RegistrationActivity.class);
-                startActivity(intent);
-            }
-        });
-        */
+        btLoginByGoogle = (Button) findViewById(R.id.bt_login_by_google);
+
+        btLoginByGoogle.setOnClickListener(this);
+        btLoginByFacebook.setOnClickListener(this);
         btLoginByEmail.setOnClickListener(this);
     }
 
@@ -149,7 +125,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onStart() {
         super.onStart();
-//        googleApiClient.connect();
         mAuth.addAuthStateListener(firebaseAuthStateListener);
 
     }
@@ -157,8 +132,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onStop() {
         super.onStop();
-//        googleApiClient.disconnect();
-
         if (firebaseAuthStateListener != null) {
             mAuth.removeAuthStateListener(firebaseAuthStateListener);
         }
@@ -217,6 +190,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+                            Prefs.setLoggedType(Prefs.EMAIL_LOGIN);
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
@@ -238,7 +212,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     Toast.makeText(LoginActivity.this, "Authentication failed.",
                             Toast.LENGTH_SHORT).show();
                 } else {
-                    //FirebaseUserManager.pushUserInfo();
                     AppUser user = new AppUser(mAuth.getCurrentUser());
                     FirebaseUserManager.pushUserInfo_v2(user);
                     Prefs.setLoggedType(Prefs.FACEBOOK_LOGIN);
@@ -286,12 +259,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         switch (view.getId()) {
             case R.id.bt_login_by_email:
                 signInByEmail(etAuthEmail.getText().toString(), etAuthPassword.getText().toString());
-            break;
+                break;
             case R.id.tv_create_account:
                 Intent intent = new Intent(LoginActivity.this, RegistrationActivity.class);
                 startActivity(intent);
                 break;
-
+            case R.id.login_by_facebook:
+                LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this,
+                        Arrays.asList("public_profile", "user_friends", "read_custom_friendlists", "email"));
+                break;
+            case R.id.bt_login_by_google:
+                signInByGoogle();
+                break;
         }
     }
 }

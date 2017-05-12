@@ -16,7 +16,6 @@ public class Prefs {
     public static final String SOURCES_FILTER = "sources-filter";
     public static final String DISPLAY_WIDTH = "display_width";
 
-
     public static final int NOT_LOGIN = 0;
     public static final int GOOGLE_LOGIN = 1;
     public static final int FACEBOOK_LOGIN = 2;

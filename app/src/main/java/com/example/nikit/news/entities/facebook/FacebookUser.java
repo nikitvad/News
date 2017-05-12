@@ -43,7 +43,8 @@ public class FacebookUser {
                 ", urlToAvatar='" + urlToAvatar + '\'' +
                 '}';
     }
-    public HashMap<String, String> toMap(){
+
+    public HashMap<String, String> toMap() {
         HashMap<String, String> result = new HashMap<>();
         result.put("id", id);
         result.put("name", name);

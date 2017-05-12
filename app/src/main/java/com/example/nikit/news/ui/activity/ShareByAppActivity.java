@@ -35,7 +35,7 @@ public class ShareByAppActivity extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Bundle bundle = getIntent().getBundleExtra("ARGS");
         if (bundle != null) {
@@ -43,7 +43,7 @@ public class ShareByAppActivity extends AppCompatActivity
 
             commentToNews = CommentToNewsFragment.newInstance(getIntent().getBundleExtra("ARGS"));
             availableFriends = AvailableFriendsFragment.newInstance();
-            getSupportFragmentManager().beginTransaction().add(R.id.share_container, availableFriends).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.share_container, availableFriends).commit();
 
         } else {
             Toast.makeText(getApplicationContext(), "error", Toast.LENGTH_SHORT).show();
@@ -54,7 +54,7 @@ public class ShareByAppActivity extends AppCompatActivity
     @Override
     public void onFragmentInteraction(HashSet<String> uid) {
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.share_container, commentToNews).commit();
+                .replace(R.id.share_container, commentToNews).commit();
         selectedFriends = uid;
     }
 

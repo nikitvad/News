@@ -40,7 +40,6 @@ public class WebViewActivity extends BaseActivity {
 
         webView = (WebView) findViewById(R.id.m_web_view);
 
-
         if (PreferenceManager.getDefaultSharedPreferences(getApplication())
                 .getBoolean(Constants.PREF_KEY_ENABLE_JS, false)) {
 

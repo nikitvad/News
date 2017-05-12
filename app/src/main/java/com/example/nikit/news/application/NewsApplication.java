@@ -27,8 +27,7 @@ public class NewsApplication extends Application {
         WindowManager wm = (WindowManager) getApplicationContext().getSystemService(getApplicationContext().WINDOW_SERVICE);
         Point size = new Point();
         wm.getDefaultDisplay().getSize(size);
-        //SharedPreferences preferences = getSharedPreferences(getApplicationContext().getPackageName(), MODE_PRIVATE);
-        //preferences.edit().putInt("display_width", size.x).commit();
+
         Prefs.init(getApplicationContext());
         Prefs.setDisplayWidth(size.x);
 

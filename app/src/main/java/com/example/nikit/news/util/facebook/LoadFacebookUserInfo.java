@@ -26,18 +26,19 @@ public class LoadFacebookUserInfo {
 
     public static FacebookUser getUserFromResponse(JSONObject object) {
         Gson gson = new Gson();
-        if(object==null) return null;
-            FacebookUser facebookUser = gson.fromJson(object.toString(), FacebookUser.class);
-            String urlToAvatar = "";
-            try {
-                urlToAvatar = object.getJSONObject("picture").getJSONObject("data").getString("url");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            facebookUser.setUrlToAvatar(urlToAvatar);
-            Log.d("LoadFacebookUserInfo", facebookUser.toString());
+        if (object == null) return null;
 
-            return facebookUser;
+        FacebookUser facebookUser = gson.fromJson(object.toString(), FacebookUser.class);
+        String urlToAvatar = "";
+        try {
+            urlToAvatar = object.getJSONObject("picture").getJSONObject("data").getString("url");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        facebookUser.setUrlToAvatar(urlToAvatar);
+        Log.d("LoadFacebookUserInfo", facebookUser.toString());
+
+        return facebookUser;
 
     }
 

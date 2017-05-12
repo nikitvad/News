@@ -3,7 +3,7 @@
     android:id="@+id/swipe_refresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.nikit.news.ui.fragment.FavoritesFragment">
+    tools:context="com.example.nikit.news.ui.fragment.NewsFromFriendsFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <RelativeLayout
@@ -11,17 +11,17 @@
         android:layout_height="wrap_content">
 
         <TextView
-            android:id="@+id/tv_no_favorites"
+            android:id="@+id/tv_news_from_friends_no_newses"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="40dp"
             android:gravity="center"
-            android:text="@string/frag_favorites_no_favorites_yet"
+            android:text="@string/frag_news_from_friends_no_newses_yet"
             android:visibility="gone" />
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_favorite_news"
+            android:id="@+id/rv_news_of_friends"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </RelativeLayout>

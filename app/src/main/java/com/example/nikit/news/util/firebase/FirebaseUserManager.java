@@ -100,6 +100,9 @@ public class FirebaseUserManager {
     }
 
     public static void getCurrentUserInfo(final OnCompleteListener listener) {
+        if(firebaseAuth.getCurrentUser()==null){
+            return;
+        }
         DatabaseReference reference = firebaseDatabase.getReference("users/" + firebaseAuth.getCurrentUser().getUid() + "/userInfo");
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

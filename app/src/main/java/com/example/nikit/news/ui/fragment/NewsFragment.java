@@ -1,8 +1,5 @@
 package com.example.nikit.news.ui.fragment;
 
-
-//import android.content.SharedPreferences;
-
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,10 +10,12 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.nikit.news.HidingScrollListener;
 import com.example.nikit.news.R;
@@ -40,6 +39,7 @@ public class NewsFragment extends Fragment {
     private RecyclerView rvNews;
     private NewsRvAdapter newsRvAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private View llInternetConnectionError;
 
     private LoadNewsAsyncTask newsAsyncTask;
 
@@ -55,7 +55,7 @@ public class NewsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         sqLiteDbHelper = new SqLiteDbHelper(getContext());
-        return inflater.inflate(R.layout.news_retrofit, container, false);
+        return inflater.inflate(R.layout.fragment_news_main, container, false);
     }
 
     @Override
@@ -70,6 +70,7 @@ public class NewsFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        llInternetConnectionError = view.findViewById(R.id.ll_no_newses_message);
         btFilter = (Button) view.findViewById(R.id.bt_filter);
         btFilter.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,10 +95,8 @@ public class NewsFragment extends Fragment {
             @Override
             public void onRefresh() {
                 updateContent();
-                swipeRefreshLayout.setRefreshing(true);
             }
         });
-
 
     }
 
@@ -107,19 +106,17 @@ public class NewsFragment extends Fragment {
                 if (newsAsyncTask != null && !newsAsyncTask.isCancelled()) {
                     newsAsyncTask.cancel(true);
                 }
-                newsRvAdapter.clearData();
                 newsAsyncTask = new LoadNewsAsyncTask();
                 newsAsyncTask.execute();
-            } else if (newsRvAdapter.getItemCount() < 1) {
+            } else if (newsRvAdapter.getArticles().size() < 1) {
                 new LoadArticlesFromDbAsync().execute();
+                swipeRefreshLayout.setRefreshing(false);
+                Toast.makeText(getContext(), R.string.toast_msg_connection_error, Toast.LENGTH_SHORT).show();
+            } else {
+                swipeRefreshLayout.setRefreshing(false);
+                Toast.makeText(getContext(), R.string.toast_msg_connection_error, Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        new SaveNewsesToDatabaseAsync().execute();
     }
 
     class LoadNewsAsyncTask extends AsyncTask<Void, News, Void> {
@@ -127,17 +124,21 @@ public class NewsFragment extends Fragment {
 
         @Override
         protected void onPreExecute() {
-            //sourceIds = preferences.getStringSet(Constants.FILTER_SOURCES_TAG, new HashSet<String>());
             sourceIds = Prefs.getSourcesFilter();
             database = DatabaseManager.getInstance().openDatabase();
+            llInternetConnectionError.setVisibility(View.GONE);
             swipeRefreshLayout.setRefreshing(true);
+            newsRvAdapter.clearData();
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             DatabaseManager.getInstance().closeDatabase();
             swipeRefreshLayout.setRefreshing(false);
-            // new LoadArticlesFromDbAsync().execute();
+            if (newsRvAdapter.getArticles().size() < 1) {
+            }
+            new SaveNewsesToDatabaseAsync().execute();
+
         }
 
         @Override
@@ -151,18 +152,12 @@ public class NewsFragment extends Fragment {
 
             if (getActivity() != null && NetworkUtil.isNetworkAvailable(getActivity())) {
 
-                if (sourceIds.size() > 0) {
-                    //  sqLiteDbHelper.clearNewsTable(database);
-                } else {
-                    return null;
-                }
                 Iterator<String> iterator = sourceIds.iterator();
                 while (iterator.hasNext()) {
                     String sourceId = iterator.next();
                     News news = NetworkUtil.getNewsFromSource(sourceId, "top");
 
                     if (news != null && news.getArticles().size() > 0) {
-
                         for (News.Article item : news.getArticles()) {
                             if (sqLiteDbHelper.isLikedNewsContain(database, item.getArticleId())) {
                                 item.setLiked(true);
@@ -172,10 +167,6 @@ public class NewsFragment extends Fragment {
                         }
 
                         publishProgress(news);
-
-                        if (news != null && news.getArticlesCount() > 0) {
-                            //    sqLiteDbHelper.insertArticles(database, news.getArticles());
-                        }
                     }
                 }
 
@@ -205,6 +196,8 @@ public class NewsFragment extends Fragment {
         protected void onPostExecute(Void aVoid) {
             if (articles.size() > 0) {
                 newsRvAdapter.swapData(articles);
+            } else if (newsRvAdapter.getArticles().size() < 1) {
+                llInternetConnectionError.setVisibility(View.VISIBLE);
             }
             DatabaseManager.getInstance().closeDatabase();
         }
@@ -235,83 +228,13 @@ public class NewsFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            if (newsRvAdapter.getItemCount() > 0) {
+            if (newsRvAdapter.getArticles().size() > 0) {
                 dbHelper.clearNewsTable(database);
+                Log.d("saving data", "start");
                 dbHelper.insertArticles(database, newsRvAdapter.getArticles());
             }
 
             return null;
         }
     }
-
-
-    class LoadNextNewsAsyncTask extends AsyncTask<Void, News, Void> {
-        private Set<String> sourceIds;
-
-
-        @Override
-        protected void onPreExecute() {
-            sourceIds = Prefs.getSourcesFilter();
-            database = DatabaseManager.getInstance().openDatabase();
-            swipeRefreshLayout.setRefreshing(true);
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            DatabaseManager.getInstance().closeDatabase();
-            swipeRefreshLayout.setRefreshing(false);
-        }
-
-        @Override
-        protected void onCancelled() {
-            swipeRefreshLayout.setRefreshing(false);
-            DatabaseManager.getInstance().closeDatabase();
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-
-            if (getActivity() != null && NetworkUtil.isNetworkAvailable(getActivity())) {
-
-                if (sourceIds.size() > 0) {
-                    //  sqLiteDbHelper.clearNewsTable(database);
-                } else {
-                    return null;
-                }
-                Iterator<String> iterator = sourceIds.iterator();
-                while (iterator.hasNext()) {
-                    String sourceId = iterator.next();
-                    News news = NetworkUtil.getNewsFromSource(sourceId, "top");
-
-                    if (news != null && news.getArticles().size() > 0) {
-
-                        for (News.Article item : news.getArticles()) {
-                            if (sqLiteDbHelper.isLikedNewsContain(database, item.getArticleId())) {
-                                item.setLiked(true);
-                            } else {
-                                item.setLiked(false);
-                            }
-                        }
-
-                        publishProgress(news);
-
-                        if (news != null && news.getArticlesCount() > 0) {
-                            //    sqLiteDbHelper.insertArticles(database, news.getArticles());
-                        }
-                    }
-                }
-
-            } else {
-                return null;
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(News... values) {
-            newsRvAdapter.addArticles(values[0].getArticles());
-        }
-    }
-
 }

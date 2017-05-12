@@ -1,5 +1,6 @@
 package com.example.nikit.news.ui.adapter.viewHolder;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,13 +13,14 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.nikit.news.Constants;
 import com.example.nikit.news.R;
 import com.example.nikit.news.entities.firebase.SharedNews;
+import com.example.nikit.news.ui.activity.WebViewActivity;
 import com.example.nikit.news.util.Util;
 
 /**
  * Created by nikit on 16.04.2017.
  */
 
-public class SharedNewsViewHolder extends RecyclerView.ViewHolder {
+public class SharedNewsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     public static int imageWidth = 0;
     public static int imageHeight = 0;
@@ -28,6 +30,8 @@ public class SharedNewsViewHolder extends RecyclerView.ViewHolder {
     private TextView tvNewsTitle;
     private ImageView ivNewsImage;
     private TextView tvNewsDescription;
+
+    private SharedNews sharedNews;
 
     public SharedNewsViewHolder(View itemView) {
         super(itemView);
@@ -46,9 +50,12 @@ public class SharedNewsViewHolder extends RecyclerView.ViewHolder {
         tvNewsTitle = (TextView) itemView.findViewById(R.id.tv_shared_news_article_title);
         ivNewsImage = (ImageView) itemView.findViewById(R.id.iv_shared_news_image);
         tvNewsDescription = (TextView) itemView.findViewById(R.id.tv_shared_news_article_desc);
+
+        tvNewsTitle.setOnClickListener(this);
     }
 
     public void bindSharedNews(SharedNews news) {
+        this.sharedNews = news;
         tvUserName.setText(news.getFacebookUser().getName());
         Util.loadCircleImage(ivUserAvatar, news.getFacebookUser().getUrlToAvatar());
         tvComment.setText(news.getComment());
@@ -67,5 +74,15 @@ public class SharedNewsViewHolder extends RecyclerView.ViewHolder {
                     .centerCrop().into(ivNewsImage);
         }
 
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.tv_shared_news_article_title:
+                Intent intent = new Intent(itemView.getContext(), WebViewActivity.class);
+                intent.putExtra(WebViewActivity.KEY_NEWS_URL, sharedNews.getArticle().getUrl());
+                itemView.getContext().startActivity(intent);
+        }
     }
 }

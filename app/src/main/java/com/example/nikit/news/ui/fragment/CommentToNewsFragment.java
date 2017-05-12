@@ -54,6 +54,7 @@ public class CommentToNewsFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+
     public static CommentToNewsFragment newInstance(Bundle args) {
         CommentToNewsFragment fragment = new CommentToNewsFragment();
         fragment.setArguments(args);
@@ -90,13 +91,13 @@ public class CommentToNewsFragment extends Fragment {
         ivNewsImage = (ImageView) view.findViewById(R.id.iv_comment_fragment_news_image);
         tvNewsDesc = (TextView) view.findViewById(R.id.tv_comment_fragment_article_desc);
 
-        etComment = (EditText)view.findViewById(R.id.et_news_comment);
+        etComment = (EditText) view.findViewById(R.id.et_news_comment);
 
         btSubmit = (Button) view.findViewById(R.id.bt_comment_fragment_submit);
         btSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mListener!=null){
+                if (mListener != null) {
                     mListener.onInteraction(etComment.getText().toString());
                 }
             }
@@ -113,7 +114,6 @@ public class CommentToNewsFragment extends Fragment {
                 tvUserName.setText(facebookUser.getName());
             }
         }).load();
-
 
     }
 

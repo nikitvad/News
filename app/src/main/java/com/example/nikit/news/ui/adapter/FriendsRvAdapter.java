@@ -66,7 +66,6 @@ public class FriendsRvAdapter extends RecyclerView.Adapter<FriendsRvAdapter.Frie
         void onClick(View v, FacebookUser facebookUser);
     }
 
-
     class FriendViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private ImageView ivAvatar;
         private TextView tvName;

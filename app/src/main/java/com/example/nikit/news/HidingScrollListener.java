@@ -47,7 +47,6 @@ public class HidingScrollListener extends RecyclerView.OnScrollListener {
         }
     }
 
-
     @Override
     public final void onScrolled(RecyclerView recyclerView, int dx, int dy) {
         verticalOffset += dy;
@@ -71,7 +70,6 @@ public class HidingScrollListener extends RecyclerView.OnScrollListener {
         }
 
     }
-
 
     private void setTranslationY(int verticalOffset) {
         toolbar.setTranslationY(verticalOffset);
@@ -99,8 +97,6 @@ public class HidingScrollListener extends RecyclerView.OnScrollListener {
                     .setInterpolator(new LinearInterpolator())
                     .setDuration(180);
         }
-
-
     }
 
     private void toolbarAnimateHide() {

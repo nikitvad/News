@@ -3,39 +3,45 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
     tools:context="com.example.nikit.news.ui.activity.LoginActivity">
 
     <!-- TODO: Update blank fragment layout -->
     <LinearLayout
         android:id="@+id/login_by_email"
         android:layout_width="match_parent"
-
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:orientation="vertical">
 
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/app_icon"
+            android:layout_gravity="center_horizontal"/>
         <EditText
             android:id="@+id/et_auth_email"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:hint="Email"
+            android:layout_height="@dimen/login_et_height"
+            android:hint="@string/login_et_email_hint"
             android:inputType="textEmailAddress" />
 
         <EditText
             android:id="@+id/et_auth_pass"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:hint="Password"
+            android:layout_height="60dp"
+            android:hint="@string/login_et_password_hint"
             android:inputType="textPassword" />
 
         <Button
             android:id="@+id/bt_login_by_email"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="@dimen/login_et_height"
             android:background="@drawable/rounded_button"
-            android:text="Login"
+            android:text="@string/login_bt_sign_in_by_emil_title"
             android:textColor="#fff"
+            android:textAllCaps="false"
             android:textSize="20sp" />
 
         <LinearLayout
@@ -78,8 +84,7 @@
             style="?borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:text="create acount"
+            android:text="@string/login_create_account"
             android:textAllCaps="false"
             />
 
