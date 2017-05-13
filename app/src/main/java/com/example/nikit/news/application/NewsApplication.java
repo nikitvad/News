@@ -8,8 +8,11 @@ import android.view.WindowManager;
 
 import com.example.nikit.news.database.DatabaseManager;
 import com.example.nikit.news.database.SqLiteDbHelper;
+import com.example.nikit.news.util.NetworkUtil;
 import com.example.nikit.news.util.Prefs;
+import com.example.nikit.news.util.firebase.FirebaseUserManager;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 
 
@@ -31,6 +34,9 @@ public class NewsApplication extends Application {
         Prefs.init(getApplicationContext());
         Prefs.setDisplayWidth(size.x);
 
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            FirebaseUserManager.synchronizeUserData(getApplicationContext());
+        }
 
     }
 

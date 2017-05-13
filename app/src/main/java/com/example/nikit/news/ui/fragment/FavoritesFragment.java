@@ -78,6 +78,7 @@ public class FavoritesFragment extends Fragment {
             new FirebaseLoadNews().loadFavorites(new FirebaseLoadNews.OnFavoriteNewsLoadingStateListener() {
                 @Override
                 public void onProgress(News.Article article) {
+                    tvNoFavorites.setVisibility(View.GONE);
                     adapter.addArticle(article);
                 }
 

@@ -2,6 +2,7 @@ package com.example.nikit.news.util.firebase;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.example.nikit.news.database.DatabaseManager;
 import com.example.nikit.news.database.SqLiteDbHelper;
@@ -130,6 +131,8 @@ public class FirebaseUserManager {
     public static void synchronizeUserData(Context context) {
         final SqLiteDbHelper sqLiteDbHelper = new SqLiteDbHelper(context);
         final SQLiteDatabase database = DatabaseManager.getInstance().openDatabase();
+
+        Log.d("synchronizeUserData", "start synchronizing");
 
         firebaseDatabase = FirebaseDatabase.getInstance();
         DatabaseReference reference = firebaseDatabase.getReference(FB_REF_USERS + "/" + firebaseAuth.getCurrentUser().getUid());
