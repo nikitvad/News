@@ -16,6 +16,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_NEWS_OF_FRIENDS_ALL;
+import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_USERS;
+
 /**
  * Created by nikit on 16.04.2017.
  */
@@ -26,7 +29,6 @@ public class LoadNewsesFromFriends {
     private FirebaseDatabase database;
     private FirebaseAuth firebaseAuth;
 
-
     public LoadNewsesFromFriends() {
         database = FirebaseDatabase.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
@@ -36,8 +38,8 @@ public class LoadNewsesFromFriends {
         if (firebaseAuth.getCurrentUser() == null) {
             return;
         }
-        DatabaseReference reference = database.getReference("users/" + firebaseAuth.getCurrentUser().getUid() +
-                "/news-of-friends/all");
+        DatabaseReference reference = database.getReference(FB_REF_USERS + "/" + firebaseAuth.getCurrentUser().getUid() +
+                "/" + FB_REF_NEWS_OF_FRIENDS_ALL);
 
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -97,6 +99,7 @@ public class LoadNewsesFromFriends {
 
     public interface OnLoadingStateListener {
         void onProgress(SharedNews sharedNews);
+
         void onFinish();
     }
 }

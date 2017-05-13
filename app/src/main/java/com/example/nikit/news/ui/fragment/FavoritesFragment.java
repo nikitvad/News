@@ -28,7 +28,6 @@ public class FavoritesFragment extends Fragment {
     public FavoritesFragment() {
     }
 
-
     public static FavoritesFragment newInstance() {
         FavoritesFragment fragment = new FavoritesFragment();
         return fragment;

@@ -14,8 +14,14 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.Date;
 
+import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_LIKED_NEWS;
 import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_LIKES;
 import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_LIKES_COUNT;
+import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_NEWS;
+import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_NEWS_OF_FRIENDS_ALL;
+import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_NEWS_OF_FRIENDS_NEW;
+import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_OPEN_UID;
+import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_USERS;
 
 /**
  * Created by nikit on 11.04.2017.
@@ -26,24 +32,22 @@ public class FirebaseNewsManager {
     private static FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
     public static void pushNews(News.Article article) {
-        DatabaseReference reference = database.getReference("news");
+        DatabaseReference reference = database.getReference(FB_REF_NEWS);
         reference.child(article.getArticleId()).setValue(article.toMap());
     }
 
-
     public static void shareNewsWithFriend(final String authorUid, final String openUid, final SharedNews news) {
-        DatabaseReference reference = database.getReference("users/openUID/" + openUid);
+        DatabaseReference reference = database.getReference(FB_REF_OPEN_UID + "/" + openUid);
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String uid = dataSnapshot.getValue().toString();
 
-                Log.d("FirebaseNewsManager", uid);
-                DatabaseReference ref = database.getReference("users/" + uid + "/news-of-friends/all");
+                DatabaseReference ref = database.getReference(FB_REF_USERS + "/" + uid + "/" + FB_REF_NEWS_OF_FRIENDS_ALL);
                 ref = ref.child(authorUid).child(news.getNewsId());
                 ref.setValue(news.toMap());
 
-                ref = database.getReference("users/" + uid + "/news-of-friends/new");
+                ref = database.getReference(FB_REF_USERS + "/" + uid + "/" + FB_REF_NEWS_OF_FRIENDS_NEW);
                 ref.child(news.getNewsId()).setValue(authorUid);
             }
 
@@ -55,14 +59,15 @@ public class FirebaseNewsManager {
     }
 
     public static void getCountNewSharedNewses(final OnResultListener listener) {
-        DatabaseReference reference = database.getReference("users/" + firebaseAuth.getCurrentUser().getUid());
-        reference.child("news-of-friends/new").addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference reference = database.getReference(FB_REF_USERS + "/" + firebaseAuth.getCurrentUser().getUid());
+        reference.child(FB_REF_NEWS_OF_FRIENDS_NEW).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getValue() != null) {
                     long count = dataSnapshot.getChildrenCount();
                     if (listener != null) {
                         listener.onResult(count);
+                        Log.d("sdfasdfs", count + "");
                         dataSnapshot.getRef().removeValue();
                     }
                 } else {
@@ -82,12 +87,10 @@ public class FirebaseNewsManager {
 
     public static void likeNews(final News.Article article, final OnSuccessListener listener) {
 
-        DatabaseReference reference = database.getReference("news/" + article.getArticleId());
+        DatabaseReference reference = database.getReference(FB_REF_NEWS + "/" + article.getArticleId());
         reference.child(FB_REF_LIKES_COUNT).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d("likeNews", dataSnapshot.toString());
-
                 if (dataSnapshot.getValue() != null) {
                     int likesCount = dataSnapshot.getValue(int.class);
                     dataSnapshot.getRef().setValue(likesCount + 1);
@@ -107,19 +110,15 @@ public class FirebaseNewsManager {
 
             }
         });
-        /*
-        DatabaseReference reference1 = database.getReference("news/" + article.getArticleId());
-        reference1.child(FB_REF_LIKES).child(firebaseAuth.getCurrentUser().getUid())
-                .setValue((new Date()).getTime());
-    */
-        DatabaseReference users = database.getReference("users");
-        users.child(firebaseAuth.getCurrentUser().getUid()).child("liked-news")
+
+        DatabaseReference users = database.getReference(FB_REF_USERS);
+        users.child(firebaseAuth.getCurrentUser().getUid()).child(FB_REF_LIKED_NEWS)
                 .child(article.getArticleId()).setValue((new Date()).getTime());
     }
 
     public static void unlikeNews(News.Article article, final OnSuccessListener listener) {
 
-        DatabaseReference reference = database.getReference("news/" + article.getArticleId());
+        DatabaseReference reference = database.getReference(FB_REF_NEWS + "/" + article.getArticleId());
         reference.child(FB_REF_LIKES_COUNT).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -131,32 +130,28 @@ public class FirebaseNewsManager {
                 }
 
                 listener.onSuccess();
-
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
             }
         });
 
         reference.child(FB_REF_LIKES).child(firebaseAuth.getCurrentUser().getUid()).removeValue();
 
         reference = FirebaseDatabase.getInstance()
-                .getReference("users/" + firebaseAuth.getCurrentUser().getUid() + "/liked-news");
+                .getReference(FB_REF_USERS + "/" + firebaseAuth.getCurrentUser().getUid() + "/" + FB_REF_LIKED_NEWS);
         reference.child(article.getArticleId()).removeValue();
 
 
     }
 
     public static void getLikesCount(String newsId, final OnResultListener listener) {
-        DatabaseReference reference = database.getReference("news/" + newsId);
+        DatabaseReference reference = database.getReference(FB_REF_NEWS + "/" + newsId);
         reference.child(FB_REF_LIKES_COUNT).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d("likes-count", dataSnapshot.toString());
                 if (dataSnapshot.getValue() != null) {
-                    Log.d("likes-count", dataSnapshot.getValue().toString());
                     listener.onResult(dataSnapshot.getValue(long.class));
                 } else {
                     listener.onResult(0);
@@ -171,7 +166,7 @@ public class FirebaseNewsManager {
     }
 
     public static void isLikedCurrentUser(String newsId, final OnResultListener listener) {
-        DatabaseReference reference = database.getReference("news/" + newsId);
+        DatabaseReference reference = database.getReference(FB_REF_NEWS + "/" + newsId);
         reference.child(FB_REF_LIKES).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -196,6 +191,4 @@ public class FirebaseNewsManager {
     public static interface OnResultListener {
         void onResult(long count);
     }
-
-
 }

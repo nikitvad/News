@@ -24,7 +24,6 @@ public class CommentToNewsFragment extends Fragment {
     public static final String ARG_NEWS_IMAGE = "news_image";
     public static final String ARG_NEWS_DESC = "news_desc";
 
-
     private String newsId;
     private String newsTitle;
     private String newsDesc;

@@ -76,13 +76,14 @@ public class NewsesFromFriendsRvAdapter extends RecyclerView.Adapter<RecyclerVie
         } else {
             if (newNewsesCount > -1) {
                 items.add(newNewsesCount + 1, news);
-                notifyItemInserted(1);
+                notifyItemInserted(newNewsesCount + 1);
                 newNewsesCount++;
             } else {
                 items.add(0, new GroupTitle("new"));
                 notifyItemInserted(0);
                 items.add(1, news);
-                notifyItemInserted(1);
+                //notifyItemInserted(1);
+                notifyItemRangeInserted(0,2);
                 newNewsesCount = 1;
             }
         }

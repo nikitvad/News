@@ -33,12 +33,11 @@ public class NewsFromFriendsService extends IntentService {
             synchronized (this) {
                 try {
                     wait(10000);
-                    Log.d("NewsFromFriendsService", "service is running...");
+                    Log.d("sdfasdfs", "service is running");
                     FirebaseNewsManager.getCountNewSharedNewses(new FirebaseNewsManager.OnResultListener() {
                         @Override
                         public void onResult(long count) {
                             if (count > 0) {
-
                                 NotificationUtils.getInstance(getApplicationContext()).createInfoNotification(
                                         getResources().getString(R.string.notification_there_newses_fom_friends));
                             }

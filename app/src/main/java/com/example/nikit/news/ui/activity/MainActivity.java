@@ -112,8 +112,6 @@ public class MainActivity extends BaseActivity
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
-
     }
 
     @Override

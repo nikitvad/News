@@ -106,8 +106,6 @@ public class News {
             this.liked = liked;
         }
 
-
-
         public CharSequence getSource() {
             return source;
         }

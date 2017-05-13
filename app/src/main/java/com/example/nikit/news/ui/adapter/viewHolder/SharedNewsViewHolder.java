@@ -78,7 +78,7 @@ public class SharedNewsViewHolder extends RecyclerView.ViewHolder implements Vie
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.tv_shared_news_article_title:
                 Intent intent = new Intent(itemView.getContext(), WebViewActivity.class);
                 intent.putExtra(WebViewActivity.KEY_NEWS_URL, sharedNews.getArticle().getUrl());

@@ -1,5 +1,6 @@
 package com.example.nikit.news.ui.activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -16,6 +17,8 @@ import com.example.nikit.news.R;
 import com.example.nikit.news.database.DatabaseManager;
 import com.example.nikit.news.database.SqLiteDbHelper;
 import com.example.nikit.news.entities.firebase.AppUser;
+import com.example.nikit.news.ui.dialog.ResetPasswordDialog;
+import com.example.nikit.news.util.NetworkUtil;
 import com.example.nikit.news.util.Prefs;
 import com.example.nikit.news.util.firebase.FirebaseUserManager;
 import com.facebook.AccessToken;
@@ -37,21 +40,21 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Arrays;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
+    public static final String TAG = LoginActivity.class.getSimpleName();
     private static final int RC_SIGN_IN = 9001;
-
     private Button btLoginByEmail;
-
     private Button btLoginByFacebook;
     private Button btLoginByGoogle;
     private EditText etAuthEmail;
     private EditText etAuthPassword;
     private TextView tvCreateAccount;
+    private ProgressDialog mProgressDialog;
+    private TextView tvForgotPassword;
 
     private CallbackManager callbackManager;
     private FirebaseAuth mAuth;
@@ -66,8 +69,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         etAuthEmail = (EditText) findViewById(R.id.et_auth_email);
         etAuthPassword = (EditText) findViewById(R.id.et_auth_pass);
         tvCreateAccount = (TextView) findViewById(R.id.tv_create_account);
+        tvForgotPassword = (TextView) findViewById(R.id.tv_login_forgot_password);
 
         tvCreateAccount.setOnClickListener(this);
+        tvForgotPassword.setOnClickListener(this);
 
         //Firebase initializing
         mAuth = FirebaseAuth.getInstance();
@@ -121,7 +126,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         btLoginByEmail.setOnClickListener(this);
     }
 
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -171,7 +175,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         } else {
                             Prefs.setLoggedType(Prefs.GOOGLE_LOGIN);
                             AppUser user = new AppUser(mAuth.getCurrentUser());
-                            FirebaseUserManager.pushUserInfo_v2(user);
+                            FirebaseUserManager.pushUserInfo(user);
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
@@ -185,6 +189,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         if (!validateForm()) {
             return;
         }
+        showProgressDialog();
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -198,6 +203,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             Toast.makeText(LoginActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         }
+                        hideProgressDialog();
                     }
                 });
     }
@@ -213,7 +219,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             Toast.LENGTH_SHORT).show();
                 } else {
                     AppUser user = new AppUser(mAuth.getCurrentUser());
-                    FirebaseUserManager.pushUserInfo_v2(user);
+                    FirebaseUserManager.pushUserInfo(user);
                     Prefs.setLoggedType(Prefs.FACEBOOK_LOGIN);
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -258,19 +264,61 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.bt_login_by_email:
-                signInByEmail(etAuthEmail.getText().toString(), etAuthPassword.getText().toString());
+                if (NetworkUtil.isNetworkAvailable(this)) {
+                    signInByEmail(etAuthEmail.getText().toString(), etAuthPassword.getText().toString());
+                } else {
+                    Toast.makeText(LoginActivity.this, R.string.toast_msg_connection_error, Toast.LENGTH_SHORT).show();
+                }
                 break;
+
             case R.id.tv_create_account:
                 Intent intent = new Intent(LoginActivity.this, RegistrationActivity.class);
                 startActivity(intent);
                 break;
+
             case R.id.login_by_facebook:
-                LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this,
-                        Arrays.asList("public_profile", "user_friends", "read_custom_friendlists", "email"));
+                if (NetworkUtil.isNetworkAvailable(this)) {
+                    LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this,
+                            Arrays.asList("public_profile", "user_friends", "read_custom_friendlists", "email"));
+                } else {
+                    Toast.makeText(LoginActivity.this, R.string.toast_msg_connection_error, Toast.LENGTH_SHORT).show();
+                }
                 break;
+
             case R.id.bt_login_by_google:
-                signInByGoogle();
+                if (NetworkUtil.isNetworkAvailable(this)) {
+                    signInByGoogle();
+                } else {
+                    Toast.makeText(LoginActivity.this, R.string.toast_msg_connection_error, Toast.LENGTH_SHORT).show();
+                }
                 break;
+            case R.id.tv_login_forgot_password:
+                if (NetworkUtil.isNetworkAvailable(this)) {
+                    ResetPasswordDialog resetPasswordDialog = new ResetPasswordDialog();
+                    resetPasswordDialog.show(getSupportFragmentManager(), TAG);
+                }
+                break;
+        }
+    }
+
+    private void showProgressDialog() {
+        if (mProgressDialog == null) {
+            mProgressDialog = new ProgressDialog(this);
+            mProgressDialog.setMessage("wait please");
+            mProgressDialog.setCancelable(false);
+        }
+        mProgressDialog.show();
+    }
+
+    private void hideProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.hide();
+        }
+    }
+
+    private void dismissProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.dismiss();
         }
     }
 }

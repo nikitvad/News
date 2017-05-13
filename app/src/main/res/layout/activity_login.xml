@@ -43,14 +43,20 @@
             android:textColor="#fff"
             android:textAllCaps="false"
             android:textSize="20sp" />
-
+        <TextView
+            android:id="@+id/tv_login_forgot_password"
+            style="?borderlessButtonStyle"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tv_login_forgot_password"
+            android:textAllCaps="false" />
         <LinearLayout
-            android:id="@+id/dfsdfs"
+            android:id="@+id/social_networks"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="40dp"
-            android:layout_marginBottom="40dp"
             android:orientation="horizontal">
 
             <Button

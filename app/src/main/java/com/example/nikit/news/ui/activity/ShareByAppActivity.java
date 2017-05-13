@@ -26,7 +26,6 @@ public class ShareByAppActivity extends AppCompatActivity
     private CommentToNewsFragment commentToNews;
     private AvailableFriendsFragment availableFriends;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

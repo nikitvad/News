@@ -20,6 +20,7 @@ import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_LIKE
 import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_LIKES;
 import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_LIKES_COUNT;
 import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_NEWS;
+import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_USERS;
 
 /**
  * Created by nikit on 16.04.2017.
@@ -69,7 +70,7 @@ public class FirebaseLoadNews {
     }
 
     public static void load(Set<String> newsIds, @Nullable final OnProgressListener mListener) {
-        DatabaseReference reference = database.getReference("news");
+        DatabaseReference reference = database.getReference(FB_REF_NEWS);
 
         for (String newsId : newsIds) {
             reference.child(newsId).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -95,25 +96,21 @@ public class FirebaseLoadNews {
     }
 
     public static void loadFavorites(final OnFavoriteNewsLoadingStateListener listener) {
-        DatabaseReference reference = database.getReference("users/" + firebaseAuth.getCurrentUser().getUid());
+        DatabaseReference reference = database.getReference(FB_REF_USERS +"/" + firebaseAuth.getCurrentUser().getUid());
 
         reference.child(FB_REF_LIKED_NEWS).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getValue() != null) {
-                    Log.d("loadFavorites", dataSnapshot.toString());
                     GenericTypeIndicator<HashMap<String, Long>> t = new GenericTypeIndicator<HashMap<String, Long>>() {
                     };
                     HashMap<String, Long> hashMap = dataSnapshot.getValue(t);
-                    Log.d("loadFavorites", hashMap.toString());
-
 
                     new FirebaseLoadNews().load(hashMap.keySet(), new FirebaseLoadNews.OnProgressListener() {
                         @Override
                         public void onProgress(News.Article article) {
                             if (listener != null) {
                                 listener.onProgress(article);
-                                Log.d("loadFavorites", article.toString());
                             }
                         }
                     });

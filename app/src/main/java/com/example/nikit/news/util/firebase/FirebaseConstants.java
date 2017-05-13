@@ -7,6 +7,7 @@ package com.example.nikit.news.util.firebase;
 public class FirebaseConstants {
     public static final String FB_REF_NEWS = "news";
     public static final String FB_REF_USERS = "users";
+    public static final String FB_REF_OPEN_UID = "users/openUID";
 
     public static final String FB_REF_AUTHOR = "author";
     public static final String FB_REF_DESCRIPTION = "description";
@@ -18,14 +19,15 @@ public class FirebaseConstants {
     public static final String FB_REF_LIKES_COUNT = "likesCount";
 
 
+    public static final String FB_REF_USER_INFO = "userInfo";
     public static final String FB_REF_FRIENDS = "friends";
     public static final String FB_REF_LIKED_NEWS = "liked-news";
-    public static final String FB_REF_NEWS_OF_FRIENDS = "news-of-friends";
+    public static final String FB_REF_NEWS_OF_FRIENDS_ALL = "news-of-friends/all";
+    public static final String FB_REF_NEWS_OF_FRIENDS_NEW = "news-of-friends/new";
     public static final String FB_REF_COMMENT = "comment";
     public static final String FB_REF_DATE = "date";
     public static final String FB_REF_NEWS_ID = "newsId";
     public static final String FB_REF_NEWS_TYPE = "newsType";
-    public static final String FB_REF_OPEN_UID = "likesCount";
 
 
 }

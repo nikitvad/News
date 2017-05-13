@@ -58,7 +58,7 @@ public class NotificationUtils {
                 .setContentText(message)
                 .setContentIntent(PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT))
                 .setWhen(System.currentTimeMillis())
-                .setContentTitle("AppName");
+                .setContentTitle("News");
 
         if (sharedPreferences.getBoolean(Constants.PREF_KEY_NOTIFICATIONS_SOUND, false)) {
             if (sharedPreferences.getBoolean(Constants.PREF_KEY_NOTIFICATIONS_VIBRATE, false)) {

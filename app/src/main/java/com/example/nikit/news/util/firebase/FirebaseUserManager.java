@@ -21,6 +21,11 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 
+import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_LIKED_NEWS;
+import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_OPEN_UID;
+import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_USERS;
+import static com.example.nikit.news.util.firebase.FirebaseConstants.FB_REF_USER_INFO;
+
 /**
  * Created by nikit on 13.04.2017.
  */
@@ -30,8 +35,8 @@ public class FirebaseUserManager {
     private static FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
     public static void pushUserInfo() {
-        final DatabaseReference refToCurrUser = firebaseDatabase.getReference("users/" + firebaseAuth.getCurrentUser().getUid());
-        final DatabaseReference refToOpenUid = firebaseDatabase.getReference("users/openUID");
+        final DatabaseReference refToCurrUser = firebaseDatabase.getReference(FB_REF_USERS + "/" + firebaseAuth.getCurrentUser().getUid());
+        final DatabaseReference refToOpenUid = firebaseDatabase.getReference(FB_REF_OPEN_UID);
 
         if (Prefs.getLoggedType() == Prefs.FACEBOOK_LOGIN) {
 
@@ -63,9 +68,9 @@ public class FirebaseUserManager {
 
     }
 
-    public static void pushUserInfo_v2(AppUser user) {
-        final DatabaseReference refToUser = firebaseDatabase.getReference("users/" + user.getId() + "/userInfo");
-        final DatabaseReference refToOpenUid = firebaseDatabase.getReference("users/openUID");
+    public static void pushUserInfo(AppUser user) {
+        final DatabaseReference refToUser = firebaseDatabase.getReference(FB_REF_USERS + "/" + user.getId() + "/" + FB_REF_USER_INFO);
+        final DatabaseReference refToOpenUid = firebaseDatabase.getReference(FB_REF_OPEN_UID);
 
         refToUser.setValue(user.toHashMap());
 
@@ -100,10 +105,10 @@ public class FirebaseUserManager {
     }
 
     public static void getCurrentUserInfo(final OnCompleteListener listener) {
-        if(firebaseAuth.getCurrentUser()==null){
+        if (firebaseAuth.getCurrentUser() == null) {
             return;
         }
-        DatabaseReference reference = firebaseDatabase.getReference("users/" + firebaseAuth.getCurrentUser().getUid() + "/userInfo");
+        DatabaseReference reference = firebaseDatabase.getReference(FB_REF_USERS + "/" + firebaseAuth.getCurrentUser().getUid() + "/" + FB_REF_USER_INFO);
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -127,7 +132,7 @@ public class FirebaseUserManager {
         final SQLiteDatabase database = DatabaseManager.getInstance().openDatabase();
 
         firebaseDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference reference = firebaseDatabase.getReference("users/" + firebaseAuth.getCurrentUser().getUid());
+        DatabaseReference reference = firebaseDatabase.getReference(FB_REF_USERS + "/" + firebaseAuth.getCurrentUser().getUid());
 
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -135,7 +140,7 @@ public class FirebaseUserManager {
                 GenericTypeIndicator<HashMap<String, Long>> t = new GenericTypeIndicator<HashMap<String, Long>>() {
                 };
                 HashMap<String, Long> likedNewsIds;
-                likedNewsIds = dataSnapshot.child("liked-news").getValue(t);
+                likedNewsIds = dataSnapshot.child(FB_REF_LIKED_NEWS).getValue(t);
                 sqLiteDbHelper.clearLikedNewsTable(database);
                 if (likedNewsIds != null && likedNewsIds.size() > 0) {
                     sqLiteDbHelper.addAllLikedNewses(database, likedNewsIds);
